@@ -1,0 +1,2075 @@
+openapi: 3.0.3
+info:
+  title: Usuarios
+  version: 1.0.0
+  description: >
+    API para la gestión del componentes usuarios. Dentro del cual se gestiona los datos relaciones con los usuarios(ya sean artistas o usuarios comunes), sus listas de favoritos,deseados y comprados y la cesta de los elementos a comprar.
+
+servers:
+  - url: http://localhost:3000/v1/usuarios
+    description: Desarrollo local
+  - url: https://api.miapp.com/v1/usuarios
+    description: Producción
+
+paths:
+
+  /login:
+    get:
+      summary: Obtiene los datos del usuario autenticado según el token JWT
+      description: >
+        Este endpoint valida el token JWT enviado en la cabecera **Authorization**
+        y devuelve la información del usuario correspondiente.
+      tags: [Usuarios]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Datos del usuario obtenidos correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+              example:
+                id: 123
+                nombreUsuario: "carlos123"
+                nombreReal: "Carlos Pérez"
+                correo: "carlos@example.com"
+                descripcion: "Apasionado por la música y la producción digital."
+                fechaRegistro: "2025-10-14T18:45:00Z"
+                rutaFoto: "https://cdn.misitio.com/usuarios/123/perfil.jpg"
+                esArtista: false
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "El token JWT es inválido o ha expirado."
+                path: "/v1/usuarios/login"
+        '404':
+          description: Usuario no encontrado en la base de datos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: "No se encontró un usuario asociado al token proporcionado."
+                path: "/v1/usuarios/login"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Ocurrió un error inesperado en el servidor."
+                path: "/v1/usuarios/login"  
+  /:
+    post:
+      summary: Añadir un nuevo usuario autenticado externamente
+      description: >
+        Registra en la base de datos local un usuario previamente autenticado.  
+      tags: [Usuarios]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+            example:
+              nombreUsuario: "carlos123"
+              nombreReal: "Carlos Pérez"
+              contrasenia: "$2b$10$A1bC2dE3fG4hI5jK6lM7nO8pQ9rS0tU"
+              correo: "carlos@example.com"
+              descripcion: "Amante del rock y la producción musical."
+              rutaFoto: "https://cdn.misitio.com/usuarios/123/perfil.jpg"
+      responses:
+        '201':
+          description: Usuario creado correctamente
+          headers: 
+            Location:
+              description: URL del nuevo recurso creado
+              schema:
+                type: string
+                example: /v1/usuarios/123
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+              example:
+                id: 123
+                nombreUsuario: "carlos123"
+                nombreReal: "Carlos Pérez"
+                correo: "carlos@example.com"
+                fechaRegistro: "2025-10-14T18:45:00Z"
+                rutaFoto: "https://cdn.misitio.com/usuarios/123/perfil.jpg"
+        '400':
+          description: Datos inválidos en la solicitud
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                message: "Faltan campos requeridos o formato incorrecto."
+                path: "/v1/usuarios"
+        '401':
+          description: Token inválido o no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "El token JWT proporcionado no es válido o ha expirado."
+                path: "/v1/usuarios"
+        '409':
+          description: Conflicto — el correo o nombre de usuario ya existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 409
+                message: "El correo electrónico ya está registrado."
+                path: "/v1/usuarios"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Ocurrió un error inesperado al crear el usuario."
+                path: "/v1/usuarios"
+
+    put:
+      summary: Modificar los datos del perfil del usuario autenticado
+      description: >
+        Actualiza los datos del usuario autenticado según la información enviada.  
+        El usuario se identifica mediante el token JWT, no por un ID en la ruta.
+      tags: [Usuarios]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+            example:
+              id: 123
+              nombreUsuario: "carlos123"
+              nombreReal: "Carlos Pérez"
+              correo: "carlos.nuevo@example.com"
+              descripcion: "Apasionado por la música electrónica y el sonido envolvente."
+              rutaFoto: "https://cdn.misitio.com/usuarios/123/perfil_nuevo.jpg"
+      responses:
+        '200':
+          description: Usuario actualizado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+              example:
+                id: 123
+                nombreUsuario: "carlos123"
+                nombreReal: "Carlos Pérez"
+                correo: "carlos.nuevo@example.com"
+                descripcion: "Apasionado por la música electrónica y el sonido envolvente."
+                fechaRegistro: "2025-01-10T14:22:00Z"
+                rutaFoto: "https://cdn.misitio.com/usuarios/123/perfil_nuevo.jpg"
+        '400':
+          description: Datos inválidos o formato incorrecto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                message: "El formato del correo electrónico no es válido."
+                path: "/v1/usuarios"
+        '401':
+          description: Token inválido o no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "El token JWT proporcionado ha expirado o no tiene permisos."
+                path: "/v1/usuarios"
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: "No se encontró el usuario asociado al token."
+                path: "/v1/usuarios"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Ocurrió un error inesperado al actualizar el usuario."
+                path: "/v1/usuarios"
+
+  /{id}:
+    delete:
+      summary: Eliminar un usuario por su ID
+      description: >
+        Elimina al usuario indicado por su identificador único si coincide con el token.  
+        El usuario eliminado no podrá volver a iniciar sesión.
+      tags: [Usuarios]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único del usuario a eliminar
+          schema:
+            type: integer
+            example: 45
+      responses:
+        '204':
+          description: Usuario eliminado correctamente (sin contenido)
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "Token JWT inválido o expirado."
+                path: "/v1/usuarios/45"
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: "No se encontró un usuario con el ID especificado."
+                path: "/v1/usuarios/45"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Ocurrió un error inesperado al intentar eliminar el usuario."
+                path: "/v1/usuarios/45"
+
+  /artistas:
+    get:
+      summary: Obtener la lista de todos los artistas
+      description: >
+       Devuelve todos los artistas registrados en la plataforma, se relacion con el componente Contenido para añadir los datos de los generos preparados en vez de solo el identificado
+      tags: [Artistas]
+      responses:
+        '200':
+          description: Lista de artistas obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Artista'
+              example:
+                - id: 1
+                  nombreUsuario: "luna_music"
+                  nombreReal: "Luna Martínez"
+                  descripcion: "Cantante y compositora indie."
+                  rutaFoto: "https://cdn.misitio.com/artistas/1/perfil.jpg"
+                  esNovedad: true
+                  oyentes: 12000
+                  valoracion: 4.7
+                  genero:
+                    id: 3
+                    nombre: "Pop"
+                - id: 2
+                  nombreUsuario: "rockero92"
+                  nombreReal: "Julián Torres"
+                  descripcion: "Guitarrista y productor musical."
+                  rutaFoto: "https://cdn.misitio.com/artistas/2/perfil.jpg"
+                  esNovedad: false
+                  oyentes: 9800
+                  valoracion: 4.2
+                  genero:
+                    id: 2
+                    nombre: "Rock"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error inesperado al obtener los artistas."
+                path: "/v1/usuarios/artistas"
+
+    post:
+      summary: Añadir un nuevo artista
+      description: Crea un nuevo artista en la base de datos.
+      tags: [Artistas]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Artista'
+            example:
+              nombreUsuario: "nova_music"
+              nombreReal: "María López"
+              contrasenia: "$2b$10$abc123"
+              correo: "maria@example.com"
+              descripcion: "Cantautora emergente de pop alternativo."
+              rutaFoto: "https://cdn.misitio.com/artistas/3/perfil.jpg"
+              genero:
+                id: 3
+      responses:
+        '201':
+          description: Artista creado correctamente
+          headers:
+            Location:
+              description: URL del nuevo recurso creado
+              schema:
+                type: string
+                example: /v1/usuarios/artistas/3
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artista'
+              example:
+                id: 3
+                nombreUsuario: "nova_music"
+                nombreReal: "María López"
+                correo: "maria@example.com"
+                descripcion: "Cantautora emergente de pop alternativo."
+                rutaFoto: "https://cdn.misitio.com/artistas/3/perfil.jpg"
+                esNovedad: true
+                oyentes: 0
+                valoracion: 0
+                genero:
+                  id: 3
+                  nombre: "Pop"
+        '400':
+          description: Datos inválidos o faltantes en la solicitud
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                message: "El cuerpo de la solicitud no cumple el formato requerido."
+                path: "/v1/usuarios/artistas"
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "No se proporcionó un token válido."
+                path: "/v1/usuarios/artistas"
+        '409':
+          description: Ya existe un artista con ese nombre o correo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 409
+                message: "Ya existe un artista con ese correo electrónico."
+                path: "/v1/usuarios/artistas"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error inesperado al crear el artista."
+                path: "/v1/usuarios/artistas"
+
+    put:
+      summary: Modificar datos de un artista existente
+      description: >
+        Actualiza los datos de un artista en base al cuerpo enviado.  
+        El ID del artista debe venir incluido dentro del objeto JSON y ser valido con el token.
+      tags: [Artistas]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Artista'
+            example:
+              id: 3
+              descripcion: "Actualización del perfil de la artista."
+      responses:
+        '200':
+          description: Artista actualizado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artista'
+              example:
+                id: 3
+                nombreUsuario: "nova_music"
+                nombreReal: "María López"
+                descripcion: "Actualización del perfil de la artista."
+                rutaFoto: "https://cdn.misitio.com/artistas/3/perfil.jpg"
+                esNovedad: true
+                oyentes: 200
+                valoracion: 0.0
+                genero:
+                  id: 3
+                  nombre: "Pop"
+        '400':
+          description: Datos inválidos o faltantes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                message: "Los datos enviados no cumplen el formato esperado."
+                path: "/v1/usuarios/artistas"
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "No tiene permisos para modificar este artista."
+                path: "/v1/usuarios/artistas"
+        '404':
+          description: Artista no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: "No se encontró un artista con el ID especificado."
+                path: "/v1/usuarios/artistas"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error inesperado al actualizar el artista."
+                path: "/v1/usuarios/artistas"
+
+  /artistas/{id}:
+    get:
+      summary: Obtener los datos de un artista específico
+      description: >
+       Devuelve la información detallada de un artista identificado por su ID, parea el genero lo obtiene del componente contenido
+      tags: [Artistas]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del artista a consultar
+          schema:
+            type: integer
+            example: 3
+      responses:
+        '200':
+          description: Datos del artista obtenidos correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artista'
+              example:
+                id: 3
+                nombreUsuario: "nova_music"
+                nombreReal: "María López"
+                descripcion: "Cantautora emergente de pop alternativo."
+                rutaFoto: "https://cdn.misitio.com/artistas/3/perfil.jpg"
+                esNovedad: true
+                oyentes: 2500
+                valoracion: 4.2
+                genero:
+                  id: 3
+                  nombre: "Pop"
+        '404':
+          description: Artista no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: "No se encontró ningún artista con el ID proporcionado."
+                path: "/v1/usuarios/artistas/3"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error inesperado al obtener los datos del artista."
+                path: "/v1/usuarios/artistas/3"
+
+    delete:
+      summary: Eliminar un artista existente
+      description: Elimina el artista identificado por el ID indicado. Requiere autenticación.
+      tags: [Artistas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del artista a eliminar
+          schema:
+            type: integer
+            example: 3
+      responses:
+        '204':
+          description: Artista eliminado correctamente. No se devuelve contenido.
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "No tiene permisos para eliminar artistas."
+                path: "/v1/usuarios/artistas/3"
+        '404':
+          description: Artista no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: "No existe un artista con el ID indicado."
+                path: "/v1/usuarios/artistas/3"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Ocurrió un error al eliminar el artista."
+                path: "/v1/usuarios/artistas/3"
+
+  /favoritos/{idUsuario}:
+    get:
+      summary: Trae todos los elementos favoritos de un usuario
+      description: > 
+       Devuelve la lista completa de artistas, canciones o álbumes que el usuario tiene marcados como favoritos. Requiere relacionarse con el componente contenido para recuperar los datos de los elementos
+      tags: [Favoritos]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: idUsuario
+          in: path
+          required: true
+          description: ID del usuario cuyos favoritos se desean obtener
+          schema:
+            type: integer
+            example: 5
+      responses:
+        '200':
+          description: Lista de elementos favoritos obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Elemento'
+              example:
+                - tipo: 0
+                  elemento:
+                    id: 1
+                    nombreUsuario: "imagine.dragons"
+                    nombreReal: "Imagine Dragons"
+                    correo: "contact@imagine.com"
+                    esNovedad: true
+                    valoracion: 4.8
+                    genero:
+                      id: 3
+                      nombre: "Rock"
+                  fecha: "2025-10-14T18:45:00Z"
+
+                - tipo: 1
+                  elemento:
+                    id: 45
+                    nombre: "Believer"
+                    descripcion: "Single del álbum 'Evolve'"
+                    urlFoto: "believer.png"
+                    numVentas: 12000
+                    valoracion: 4.6
+                    precio: 1.29
+                    esNovedad: false
+                    genero:
+                      id: 3
+                      nombre: "Rock"
+                    artista:
+                      id: 1
+                      nombreUsuario: "imagine.dragons"
+                      nombreReal: "Imagine Dragons"
+                      correo: "contact@imagine.com"
+                      valoracion: 4.8
+                      genero:
+                        id: 3
+                        nombre: "Rock"
+                    fechacrea: "2023-03-10T14:00:00Z"
+                  fecha: "2025-10-10T11:20:00Z"
+
+                - tipo: 2
+                  elemento:
+                    id: 102
+                    nombre: "Evolve"
+                    descripcion: "Álbum de Imagine Dragons lanzado en 2017"
+                    urlFoto: "evolve.png"
+                    numVentas: 85000
+                    valoracion: 4.7
+                    precio: 9.99
+                    esNovedad: false
+                    genero:
+                      id: 3
+                      nombre: "Rock"
+                    artista:
+                      id: 1
+                      nombreUsuario: "imagine.dragons"
+                      nombreReal: "Imagine Dragons"
+                      correo: "contact@imagine.com"
+                      valoracion: 4.8
+                      genero:
+                        id: 3
+                        nombre: "Rock"
+                    canciones:
+                      - id: 45
+                        nombre: "Believer"
+                        descripcion: "Single principal del álbum"
+                        precio: 1.29
+                      - id: 46
+                        nombre: "Thunder"
+                        descripcion: "Éxito incluido en el álbum Evolve"
+                        precio: 1.29
+                    fechacrea: "2023-03-10T14:00:00Z"
+                  fecha: "2025-10-08T09:30:00Z"
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "Token de autenticación inválido o expirado."
+                path: "/v1/usuarios/favoritos/5"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error al obtener los elementos favoritos del usuario."
+                path: "/v1/usuarios/favoritos/5"
+
+  /favoritos/{idUsuario}/{idArtista}/artista:
+    get:
+      summary: Verifica si un artista es favorito del usuario
+      description: >
+       Comprueba si el artista especificado se encuentra marcado como favorito por el usuario indicado.
+      tags: [Favoritos]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: idUsuario
+          in: path
+          required: true
+          description: Identificador del usuario
+          schema:
+            type: integer
+            example: 15
+        - name: idArtista
+          in: path
+          required: true
+          description: Identificador del artista
+          schema:
+            type: integer
+            example: 47
+      responses:
+        '200':
+          description: Resultado de la verificación (true o false)
+          content:
+            application/json:
+              schema:
+                type: boolean
+              example: true
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "El token JWT es inválido o ha expirado."
+                path: "/v1/ususarios/favoritos/15/47/artista"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error al verificar si el artista es favorito."
+                path: "/v1/ususarios/favoritos/15/47/artista"
+
+    delete:
+      summary: Eliminar artista de favoritos
+      description: Elimina la relación de favorito entre el usuario y el artista indicado.
+      tags: [Favoritos]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: idUsuario
+          in: path
+          required: true
+          description: Identificador del usuario
+          schema:
+            type: integer
+            example: 15
+        - name: idArtista
+          in: path
+          required: true
+          description: Identificador del artista a eliminar
+          schema:
+            type: integer
+            example: 47
+      responses:
+        '204':
+          description: Artista eliminado de la lista de favoritos correctamente
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "Token JWT inválido o expirado."
+                path: "/v1/ususarios/favoritos/15/47/artista"
+        '404':
+          description: El artista no estaba en la lista de favoritos del usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: "El artista no estaba en los favoritos del usuario."
+                path: "/v1/ususarios/favoritos/15/47/artista"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error al eliminar el artista de favoritos."
+                path: "/v1/ususarios/favoritos/15/47/artista"
+
+  /favoritos/{idUsuario}/{idContenido}/contenido:
+    get:
+      summary: Verifica si un contenido es favorito del usuario
+      description: Comprueba si el contenido (canción o álbum) está marcado como favorito por el usuario especificado.
+      tags: [Favoritos]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: idUsuario
+          in: path
+          required: true
+          description: Identificador único del usuario
+          schema:
+            type: integer
+            example: 12
+        - name: idContenido
+          in: path
+          required: true
+          description: Identificador del contenido (canción o álbum)
+          schema:
+            type: integer
+            example: 88
+      responses:
+        '200':
+          description: Resultado de la verificación (true o false)
+          content:
+            application/json:
+              schema:
+                type: boolean
+              example: true
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "El token JWT es inválido o ha expirado."
+                path: "/v1/usuarios/favoritos/12/88/contenido"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error al verificar si el contenido es favorito."
+                path: "/v1/usuarios/favoritos/12/88/contenido"
+
+    delete:
+      summary: Eliminar contenido de favoritos
+      description: Elimina un contenido (canción o álbum) de la lista de favoritos del usuario especificado.
+      tags: [Favoritos]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: idUsuario
+          in: path
+          required: true
+          description: Identificador único del usuario
+          schema:
+            type: integer
+            example: 12
+        - name: idContenido
+          in: path
+          required: true
+          description: Identificador del contenido a eliminar
+          schema:
+            type: integer
+            example: 88
+      responses:
+        '204':
+          description: Contenido eliminado de favoritos correctamente
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "Token JWT inválido o expirado."
+                path: "/v1/usuarios/favoritos/12/88/contenido"
+        '404':
+          description: El contenido no estaba en los favoritos del usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: "El contenido no estaba en los favoritos del usuario."
+                path: "/v1/usuarios/favoritos/12/88/contenido"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error al eliminar el contenido de favoritos."
+                path: "/v1/usuarios/favoritos/12/88/contenido"
+
+  /favoritos:
+    post:
+      summary: Añadir un nuevo favorito
+      description: Registra un nuevo elemento (artista, canción o álbum) como favorito para el usuario especificado.
+      tags: [Favoritos]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Relacion'
+            example:
+              idUsuario: 1
+              idElemento: 45
+              tipo: 0
+      responses:
+        '201':
+          description: Favorito añadido correctamente
+          headers:
+            Location:
+              description: >
+               URL para verificar si el elemento es favorito del usuario, segun el tipo cambiara el endpoint
+              schema:
+                type: string
+                example: /v1/usuarios/favoritos/1/45/artista
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Relacion'
+              example:
+                idUsuario: 1
+                idElemento: 45
+                tipo: 0
+        '400':
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                message: "El tipo de favorito debe ser 0 (artista), 1 (canción) o 2 (álbum)."
+                path: "/v1/usuarios/favoritos"
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "El token JWT es inválido o ha expirado."
+                path: "/v1/usuarios/favoritos"
+        '409':
+          description: El elemento ya está marcado como favorito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 409
+                message: "El elemento ya se encuentra en la lista de favoritos del usuario."
+                path: "/v1/usuarios/favoritos"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error al registrar el favorito en la base de datos."
+                path: "/v1/usuarios/favoritos"
+
+  /cesta/{idUsuario}:
+    get:
+      summary: Trae todos los elementos de la cesta del usuario
+      description: >
+       Obtiene la lista de productos agregados a la cesta por el usuario, junto con el total acumulado de la compra. Debe relacionarse con el componente Contenido para formar los datos y no solo el identificador.
+      tags: [Cesta]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: idUsuario
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de elementos en la cesta del usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cesta'
+              example:
+                elementos:
+                  - idElemento: 101
+                    nombre: "Canción: Believer"
+                    precio: 1.29
+                    rutaImagen: "portada.jpg"
+                    tipo: 1
+                  - idElemento: 202
+                    nombre: "Álbum: Evolve"
+                    precio: 9.99
+                    rutaImagen: "portada.jpg"
+                    tipo: 2
+                total: 11.28
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "El token JWT es inválido o ha expirado."
+                path: "/v1/usuarios/cesta/1"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error al obtener la información de la cesta."
+                path: "/v1/usuarios/cesta/1"
+
+  /cesta:
+    post:
+      summary: Añade un nuevo elemento a la cesta
+      description: >
+        Registra un nuevo elemento en la cesta del usuario indicado en el cuerpo de la solicitud.
+      tags: [Cesta]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Relacion'
+            example:
+              idUsuario: 12
+              idElemento: 45
+              tipo: 1
+      responses:
+        '201':
+          description: Elemento añadido correctamente a la cesta
+          headers:
+            Location:
+              description: URL para consultar el elemento en la cesta del usuario
+              schema:
+                type: string
+                example: /v1/usuarios/cesta/12/45
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Relacion'
+              example:
+                idUsuario: 12
+                idElemento: 45
+                tipo: 1
+        '400':
+          description: Datos inválidos o solicitud incorrecta
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                message: "El cuerpo de la solicitud es inválido o faltan campos requeridos."
+                path: "/v1/usuarios/cesta"
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "El token JWT es inválido o ha expirado."
+                path: "/v1/usuarios/cesta"
+        '409':
+          description: El elemento ya se encuentra en la cesta del usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 409
+                message: "El elemento ya está presente en la cesta del usuario."
+                path: "/v1/usuarios/cesta"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error inesperado al registrar el elemento en la base de datos."
+                path: "/v1/usuarios/cesta"
+
+  /cesta/{idUsuario}/{idElemento}:
+    get:
+      summary: Verifica si un elemento está en la cesta del usuario
+      description: Comprueba si el usuario ha añadido el elemento a la cesta.
+      tags: [Cesta]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: idUsuario
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario
+          example: 1
+        - name: idElemento
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID del elemento a verificar
+          example: 33
+      responses:
+        '200':
+          description: Resultado de la verificación
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isDeseado:
+                    type: boolean
+                    description: Indica si el elemento está en la cesta del usuario
+                example:
+                  isDeseado: true
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "El token JWT es inválido o ha expirado."
+                path: "/v1/usuarios/cesta/1/33"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error interno del servidor al verificar el estado del elemento."
+                path: "/v1/usuarios/cesta/1/33"
+  
+    delete:
+      summary: Elimina un elemento de la cesta del usuario
+      tags: [Cesta]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: idUsuario
+          in: path
+          required: true
+          description: Identificador único del usuario
+          schema:
+            type: integer
+            example: 12
+        - name: idElemento
+          in: path
+          required: true
+          description: Identificador del elemento a eliminar de la cesta
+          schema:
+            type: integer
+            example: 102
+      responses:
+        '204':
+          description: Elemento eliminado correctamente
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "Token inválido o usuario no autorizado"
+                path: "/v1/usuarios/cesta/12/102"
+        '404':
+          description: Elemento o usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: "Elemento o usuario no encontrado"
+                path: "/v1/usuarios/cesta/12/102"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error interno del servidor"
+                path: "/v1/usuarios/cesta/12/102"
+
+  /desea/{idUsuario}:
+    get:
+      summary: Trae todos los elementos deseados del usuario
+      description: >
+       Devuelve una lista de los elementos (artistas, canciones o álbumes) que el usuario ha marcado como deseados. Requiere relacionarse con el servicio de Contenidos para obtener los datos de contenido.
+      tags: [Deseados]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: idUsuario
+          in: path
+          required: true
+          description: ID del usuario cuyo listado de deseados se desea consultar
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Lista de elementos deseados por el usuario
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Elemento'
+              example:
+                - tipo: 0
+                  elemento:
+                    id: 1
+                    nombreUsuario: "imagine.dragons"
+                    nombreReal: "Imagine Dragons"
+                    correo: "contact@imagine.com"
+                    esNovedad: true
+                    valoracion: 4.8
+                    genero:
+                      id: 3
+                      nombre: "Rock"
+                  fecha: "2025-10-14T18:45:00Z"
+
+                - tipo: 1
+                  elemento:
+                    id: 45
+                    nombre: "Believer"
+                    descripcion: "Single del álbum 'Evolve'"
+                    urlFoto: "believer.png"
+                    numVentas: 12000
+                    valoracion: 4.6
+                    precio: 1.29
+                    esNovedad: false
+                    genero:
+                      id: 3
+                      nombre: "Rock"
+                    artista:
+                      id: 1
+                      nombreUsuario: "imagine.dragons"
+                      nombreReal: "Imagine Dragons"
+                      correo: "contact@imagine.com"
+                      valoracion: 4.8
+                      genero:
+                        id: 3
+                        nombre: "Rock"
+                    fechacrea: "2023-03-10T14:00:00Z"
+                  fecha: "2025-10-10T11:20:00Z"
+
+                - tipo: 2
+                  elemento:
+                    id: 102
+                    nombre: "Evolve"
+                    descripcion: "Álbum de Imagine Dragons lanzado en 2017"
+                    urlFoto: "evolve.png"
+                    numVentas: 85000
+                    valoracion: 4.7
+                    precio: 9.99
+                    esNovedad: false
+                    genero:
+                      id: 3
+                      nombre: "Rock"
+                    artista:
+                      id: 1
+                      nombreUsuario: "imagine.dragons"
+                      nombreReal: "Imagine Dragons"
+                      correo: "contact@imagine.com"
+                      valoracion: 4.8
+                      genero:
+                        id: 3
+                        nombre: "Rock"
+                    canciones:
+                      - id: 45
+                        nombre: "Believer"
+                        descripcion: "Single principal del álbum"
+                        precio: 1.29
+                      - id: 46
+                        nombre: "Thunder"
+                        descripcion: "Éxito incluido en el álbum Evolve"
+                        precio: 1.29
+                    fechacrea: "2023-03-10T14:00:00Z"
+                  fecha: "2025-10-08T09:30:00Z"
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "El token JWT es inválido o ha expirado."
+                path: "/v1/usuarios/desea/1"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error interno al consultar los elementos deseados del usuario."
+                path: "/v1/usuarios/desea/1"
+
+  /desea/{idUsuario}/{idElemento}:
+    get:
+      summary: Verifica si un elemento está en la lista de deseos del usuario
+      description: Comprueba si el usuario ha marcado un elemento (canción o álbum) como deseado.
+      tags: [Deseados]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: idUsuario
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario
+          example: 1
+        - name: idElemento
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID del elemento a verificar
+          example: 33
+      responses:
+        '200':
+          description: Resultado de la verificación
+          content:
+            application/json:
+              schema:
+                type: boolean
+              example: true
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "El token JWT es inválido o ha expirado."
+                path: "/v1/usuarios/desea/1/33"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error interno del servidor al verificar el estado del elemento."
+                path: "/v1/usuarios/desea/1/33"
+    delete:
+      summary: Elimina un elemento de la lista de deseos del usuario
+      description: Quita un elemento (canción o álbum) de la lista de deseos del usuario especificado.
+      tags: [Deseados]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: idUsuario
+          in: path
+          required: true
+          description: ID del usuario
+          schema:
+            type: integer
+            example: 1
+        - name: idElemento
+          in: path
+          required: true
+          description: ID del elemento a eliminar
+          schema:
+            type: integer
+            example: 33
+      responses:
+        '204':
+          description: Elemento eliminado correctamente (sin contenido)
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "El token JWT es inválido o ha expirado."
+                path: "/v1/usuarios/desea/1/33"
+        '404':
+          description: Elemento o usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: "Elemento o usuario no encontrado en la lista de deseos."
+                path: "/v1/usuarios/desea/1/33"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error interno del servidor al eliminar el elemento deseado."
+                path: "/v1/usuarios/desea/1/33"
+
+  /desea:
+    post:
+      summary: Añadir un nuevo elemento a la lista de deseados del usuario
+      tags: [Deseados]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        description: Identificadores del usuario, el elemento y su tipo
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Relacion'
+            example:
+              idUsuario: 1
+              idElemento: 12
+              tipo: 1
+      responses:
+        '201':
+          description: Elemento añadido correctamente a la lista de deseados
+          headers:
+            Location:
+              description: URL del recurso creado
+              schema:
+                type: string
+                example: /v1/usuarios/desea/1/12
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Elemento añadido a la lista de deseados"
+                  relacion:
+                    $ref: '#/components/schemas/Relacion'
+              example:
+                message: "Elemento añadido a la lista de deseados"
+                relacion:
+                  idUsuario: 1
+                  idElemento: 12
+                  tipo: 1
+        '400':
+          description: Solicitud inválida o datos incompletos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                message: "Solicitud inválida o datos incompletos"
+                path: "/v1/usuarios/desea"
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "Token inválido o usuario no autorizado"
+                path: "/v1/usuarios/desea"
+        '409':
+          description: El elemento ya se encuentra en la lista de deseados del usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 409
+                message: " El elemento ya se encuentra en la lista de deseados del usuario"
+                path: "/v1/usuarios/desea"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error interno del servidor"
+                path: "/v1/usuarios/desea"
+
+  /tiene/{idUsuario}:
+    get:
+      summary: Trae todos los elementos comprados por el usuario
+      description: >
+       Devuelve una lista con todos los contenidos (canciones o álbumes) que el usuario ha comprado. Requiere una relacion con el servicio de Contenidos para recuperar la informacion de los elementos.
+      tags: [Compras]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: idUsuario
+          in: path
+          required: true
+          description: Identificador único del usuario
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Lista de elementos comprados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Elemento'
+              example:
+                - tipo: 0
+                  elemento:
+                    id: 1
+                    nombreUsuario: "imagine.dragons"
+                    nombreReal: "Imagine Dragons"
+                    correo: "contact@imagine.com"
+                    esNovedad: true
+                    valoracion: 4.8
+                    genero:
+                      id: 3
+                      nombre: "Rock"
+                  fecha: "2025-10-14T18:45:00Z"
+
+                - tipo: 1
+                  elemento:
+                    id: 45
+                    nombre: "Believer"
+                    descripcion: "Single del álbum 'Evolve'"
+                    urlFoto: "believer.png"
+                    numVentas: 12000
+                    valoracion: 4.6
+                    precio: 1.29
+                    esNovedad: false
+                    genero:
+                      id: 3
+                      nombre: "Rock"
+                    artista:
+                      id: 1
+                      nombreUsuario: "imagine.dragons"
+                      nombreReal: "Imagine Dragons"
+                      correo: "contact@imagine.com"
+                      valoracion: 4.8
+                      genero:
+                        id: 3
+                        nombre: "Rock"
+                    fechacrea: "2023-03-10T14:00:00Z"
+                  fecha: "2025-10-10T11:20:00Z"
+
+                - tipo: 2
+                  elemento:
+                    id: 102
+                    nombre: "Evolve"
+                    descripcion: "Álbum de Imagine Dragons lanzado en 2017"
+                    urlFoto: "evolve.png"
+                    numVentas: 85000
+                    valoracion: 4.7
+                    precio: 9.99
+                    esNovedad: false
+                    genero:
+                      id: 3
+                      nombre: "Rock"
+                    artista:
+                      id: 1
+                      nombreUsuario: "imagine.dragons"
+                      nombreReal: "Imagine Dragons"
+                      correo: "contact@imagine.com"
+                      valoracion: 4.8
+                      genero:
+                        id: 3
+                        nombre: "Rock"
+                    canciones:
+                      - id: 45
+                        nombre: "Believer"
+                        descripcion: "Single principal del álbum"
+                        precio: 1.29
+                      - id: 46
+                        nombre: "Thunder"
+                        descripcion: "Éxito incluido en el álbum Evolve"
+                        precio: 1.29
+                    fechacrea: "2023-03-10T14:00:00Z"
+                  fecha: "2025-10-08T09:30:00Z"
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "Token no válido o expirado"
+                path: "/v1/usuarios/tiene/1"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error inesperado al obtener los datos de compra"
+                path: "/v1/usuarios/tiene/1"
+
+    post:
+      summary: Registra una compra del usuario
+      description: Transfiere todos los elementos de la cesta del usuario a la lista de compras (`tiene`) y vacía la cesta.
+      tags: [Compras]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: idUsuario
+          in: path
+          required: true
+          description: Identificador único del usuario
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '201':
+          description: Compra registrada correctamente
+          headers:
+            Location:
+              description: URL del historial actualizado de compras del usuario
+              schema:
+                type: string
+                example: /v1/usuarios/tiene/1
+        '400':
+          description: No hay elementos en la cesta o datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                message: "No hay elementos en la cesta para procesar"
+                path: "/v1/usuarios/tiene/1"
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "Token no válido o expirado"
+                path: "/v1/usuarios/tiene/1"
+        '500':
+          description: Error interno al registrar la compra
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error inesperado al registrar la compra"
+                path: "/v1/usuarios/tiene/1"
+
+  /tiene/{idUsuario}/{idElemento}:
+    get:
+      summary: Verifica si un elemento fue comprado
+      description: Devuelve `true` o `false` según si el usuario compró el contenido especificado.
+      tags: [Compras]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: idUsuario
+          in: path
+          required: true
+          description: Identificador único del usuario
+          schema:
+            type: integer
+            example: 1
+        - name: idElemento
+          in: path
+          required: true
+          description: Identificador del contenido (canción o álbum)
+          schema:
+            type: integer
+            example: 45
+      responses:
+        '200':
+          description: Resultado de la verificación
+          content:
+            application/json:
+              schema:
+                type: boolean
+              example: true
+        '401':
+          description: Token inválido o usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 401
+                message: "Token no válido o expirado"
+                path: "/v1/usuarios/tiene/1/45"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                message: "Error inesperado al consultar el estado de compra"
+                path: "/v1/usuarios/tiene/1/45"
+
+components:
+  schemas:
+    Relacion:
+      type: object
+      required:
+        - idUsuario
+        - idElemento
+        - tipo
+      properties:
+        idUsuario:
+          type: integer
+          description: Identificador único del usurio
+          example: 1
+        idElemento:
+          type: integer
+          description: Identificador único del elemento
+          example: 3
+        tipo:
+          type: integer
+          enum: [0, 1, 2]
+          description: >
+            Tipo de elemento favorito:
+              - 0 = Artista  
+              - 1 = Canción  
+              - 2 = Álbum
+          example: 1
+    Genero:
+      type: object
+      required:
+        - id
+        - nombre
+      properties:
+        id:
+          type: integer
+          description: Identificador único del género musical
+          example: 3
+        nombre:
+          type: string
+          maxLength: 100
+          description: Nombre del género musical
+          example: "Rock"
+    Usuario:
+      type: object 
+      required:
+        - id
+        - nombreUsuario
+        - nombreReal
+        - contrasenia
+        - correo
+      properties:
+        id:
+          type: integer
+          format: int16
+          description: Identificador único del usuario
+          example: 1
+        nombreUsuario:
+          type: string
+          maxLength: 50
+          description: Nombre de usuario en la web
+          example: "carlos123"
+        nombreReal:
+          type: string
+          maxLength: 100
+          description: Nombre completo del usuario
+          example: "Carlos Pérez"
+        contrasenia:
+          type: string
+          format: password
+          description: Contraseña encriptada del usuario
+          example: "$2b$10$A1bC2dE3fG4hI5jK6lM7nO8pQ9rS0tU"
+        correo:
+          type: string
+          format: email
+          maxLength: 70
+          description: Correo electrónico del usuario
+          example: "carlos@example.com"
+        descripcion:
+          type: string
+          nullable: true
+          maxLength: 256
+          description: Descripción o biografía del usuario
+          example: "Apasionado por la música y la producción digital."
+        fechaRegistro:
+          type: string
+          format: date-time
+          description: Fecha y hora en que se registró el usuario
+          example: "2025-10-14T18:45:00Z"
+        rutaFoto:
+          type: string
+          nullable: true
+          maxLength: 255
+          description: nombre para acceder a la ruta de la imagen
+          example: "perfil.jpg"
+    Artista:
+      allOf:
+        - $ref: '#/components/schemas/Usuario'
+        - type: object
+          required:
+            - esNovedad
+            - oyentes
+            - valoracion
+            - genero
+          properties:
+            esNovedad:
+              type: boolean
+              description: Indica si el artista es destacado o de reciente incorporación
+              example: true
+            oyentes:
+              type: integer
+              minimum: 0
+              description: Cantidad total de oyentes del artista
+              example: 15420
+            valoracion:
+              type: number
+              format: float
+              minimum: 0
+              maximum: 5
+              description: Valoración promedio del artista (de 0.0 a 5.0)
+              example: 3.5
+            genero:
+              $ref: '#/components/schemas/Genero'
+    Cancion:
+      type: object
+      required:
+        - id
+        - nombre
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Electric Dreams"
+        descripcion:
+          type: string
+          example: "Álbum debut de la banda SynthWave"
+        urlFoto:
+          type: string
+          description: URL de la foto del elemento
+          example: "amazon.png"
+        numVentas:
+          type: integer
+          example: 120
+        valoracion:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 5
+          description: Valoración promedio del artista (de 0.0 a 5.0)
+          example: 3.5
+        precio:
+          type: number
+          format: float
+          example: 19.99
+        esNovedad:
+          type: boolean
+          example: true
+        genero:
+          $ref: '#/components/schemas/Genero'
+        artista:
+          $ref: '#/components/schemas/Artista'
+        fechacrea:
+          type: string
+          format: date-time
+          example: "2025-10-06T14:00:00Z"
+
+    Album:
+      allOf:
+        - $ref: '#/components/schemas/Cancion'
+        - type: object
+          properties:
+            canciones:
+              type: array
+              description: Lista de canciones pertenecientes al álbum
+              items:
+                $ref: '#/components/schemas/Cancion'
+          required:
+            - canciones
+
+    Elemento:
+      type: object
+      required:
+        - tipo
+        - elemento
+      properties:
+        tipo:
+          type: integer
+          enum: [0, 1, 2]
+          description: >
+            Tipo de elemento favorito:
+              - 0 = Artista  
+              - 1 = Canción  
+              - 2 = Álbum
+          example: 1
+        elemento:
+          description: Objeto del elemento favorito según su tipo
+          oneOf:
+            - $ref: '#/components/schemas/Artista'
+            - $ref: '#/components/schemas/Cancion'
+            - $ref: '#/components/schemas/Album'
+          discriminator:
+            propertyName: tipo
+            mapping:
+              0: '#/components/schemas/Artista'
+              1: '#/components/schemas/Cancion'
+              2: '#/components/schemas/Album'
+        fecha:
+          type: string
+          format: date-time
+          description: Fecha y hora en que se registró la relacion
+          example: "2025-10-14T18:45:00Z"
+    CestaItem:
+      type: object
+      required:
+        - idElemento
+        - nombre
+        - precio
+        - rutaImagen
+        - tipo
+      properties:
+        idElemento:
+          type: integer
+          description: Identificador del contenido agregado a la cesta
+          example: 102
+        nombre:
+          type: string
+          maxLength: 150
+          description: Nombre del contenido o producto en la cesta
+          example: "Álbum: Night Visions"
+        precio:
+          type: number
+          format: float
+          minimum: 0
+          description: Precio del elemento en la cesta
+          example: 9.99
+        rutaImagen:
+          type: string
+          maxLength: 255
+          description: URL o ruta de la imagen del contenido
+          example: "portada.jpg"
+        tipo:
+          type: integer
+          enum: [1, 2]
+          description: >
+            Tipo de contenido:
+              - 1 = Canción  
+              - 2 = Álbum
+          example: 2
+    Cesta:
+      type: object
+      required:
+        - items
+        - total
+      properties:
+        items:
+          type: array
+          description: Lista de elementos actualmente en la cesta del usuario
+          items:
+            $ref: '#/components/schemas/CestaItem'
+          example:
+            - idElemento: 102
+              nombre: "Álbum: Night Visions"
+              precio: 9.99
+              rutaImagen: "https://cdn.misitio.com/contenidos/102/portada.jpg"
+              tipo: 2
+            - idElemento: 78
+              nombre: "Canción: Believer"
+              precio: 1.29
+              rutaImagen: "https://cdn.misitio.com/contenidos/78/portada.jpg"
+              tipo: 1
+        total:
+          type: number
+          format: float
+          minimum: 0
+          description: Suma total del valor de todos los elementos en la cesta
+          example: 11.28
+
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          description: Código HTTP o interno del error
+          example: 400
+        message:
+          type: string
+          description: Descripción legible del error
+          example: "Solicitud inválida"
+        path:
+          type: string
+          description: Endpoint donde ocurrió el error
+          example: "/v1/usuarios"
+
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,38 @@
+{
+  "name": "gc02-gps25_usuario",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Este proyecto es un **microservicio backend** desarrollado con **Node.js**, conectado a una base de datos **PostgreSQL**, y diseñado para ser modular, escalable y fácil de desplegar.",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs": "jsdoc -c jsdoc.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uni-msg/GC02-GPS25_Usuario.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/uni-msg/GC02-GPS25_Usuario/issues"
+  },
+  "homepage": "https://github.com/uni-msg/GC02-GPS25_Usuario#readme",
+  "dependencies": {
+    "@prisma/client": "^6.18.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "firebase-admin": "^13.5.0",
+    "prisma": "^6.18.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "jsdoc": "^4.0.5",
+    "nodemon": "^3.1.10"
+  }
+}
