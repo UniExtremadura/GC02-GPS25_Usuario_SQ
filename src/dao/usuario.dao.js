@@ -55,4 +55,22 @@ export const UsuarioDAO = {
     });
   },
 
+  /**
+   * Crea un nuevo usuario en la base de datos.
+   *
+   * @async
+   * @function create
+   * @memberof UsuarioDAO
+   *
+   * @param {object} data - Datos del usuario a crear.
+   * @param {PrismaClient|TransactionClient} [tx=prisma] - Cliente o transacción de Prisma.
+   * @returns {Promise<object>} Usuario recién creado.
+   *
+   * @example
+   * const nuevo = await UsuarioDAO.create({ nombreusuario: "test", ... });
+   */
+  async create(data, tx = prisma) {
+    return tx.usuario.create({ data });
+  },
+
 };

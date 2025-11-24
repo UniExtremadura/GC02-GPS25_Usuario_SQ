@@ -55,6 +55,41 @@ export const UsuarioController = {
       }));
     }
   },
+  
+  /**
+   * Crea un nuevo usuario (autenticado externamente). Regresa 201 y Location.
+   * @async
+   * @function createUsuario
+   * @route POST /api/usuarios/
+   * @returns {Promise<UsuarioDTO|ArtistaDTO|ErrorResponseDTO>}
+   * @response 201 - Usuario creado correctamente. Location header con /api/usuarios/{id}.
+   * @response 400 - Parámetros inválidos.
+   * @response 401 - Token inválido (middleware previo).
+   * @response 403 - Usuario no autorizado (middleware previo).
+   * @response 409 - Conflicto (correo/nombre existente).
+   * @response 500 - Error interno al crear usuario.
+   */
+  async createUsuario(req, res) {
+    try {
+      const data = await UsuarioService.createUsuario(req.body);
+
+      res
+        .status(201)
+        .location(`/api/usuarios/${data.id}`)
+        .json(data);
+    } catch (error) {
+      console.error(error);
+      if (error instanceof ErrorResponseDTO) return res.status(error.code).json(error);
+
+      const status = error.message?.includes('ya está') || error.message?.includes('ya existe') ? 409 : 500;
+      res.status(status).json(new ErrorResponseDTO({
+        code: status,
+        message: error.message || 'Error al crear el usuario.',
+        path: req.originalUrl,
+      }));
+    }
+  },
+
 
 
 };

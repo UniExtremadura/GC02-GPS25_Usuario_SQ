@@ -19,4 +19,13 @@ const router = Router();
  */
 router.get('/login', verifyFirebaseToken, UsuarioController.getLogin);  //Endpoint privado
 
+/**
+ * @route POST /api/usuarios/
+ * @description Crea un nuevo usuario autenticado externamente y lo registra en la base de datos.
+ * @access Público
+ * @body {UsuarioDTO} Datos del usuario a registrar.
+ * @returns {UsuarioDTO|ArtistaDTO|ErrorResponseDTO} Usuario creado.
+ */
+router.post('/', UsuarioController.createUsuario);
+
 export default router;
