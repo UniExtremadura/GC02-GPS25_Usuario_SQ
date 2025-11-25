@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model artista {
+  idusuario  Int     @id @db.SmallInt
+  esnovedad  Boolean @default(true)
+  oyentes    Int     @default(0)
+  valoracion Decimal @default(0) @db.Decimal(2, 1)
+  idgenero   Int     @db.SmallInt
+  usuario    usuario @relation(fields: [idusuario], references: [id], onDelete: Cascade, map: "fk_ususarioartista")
+}
+
+model usuario {
+  id                        Int                         @id @default(autoincrement()) @db.SmallInt
+  nombreusuario             String                      @unique @db.VarChar(50)
+  nombrereal                String                      @db.VarChar(100)
+  contrasenia               String
+  correo                    String                      @unique @db.VarChar(70)
+  descripcion               String?                     @db.VarChar(255)
+  fecharegistro             DateTime?                   @default(now()) @db.Timestamp(6)
+  rutafoto                  String?                     @db.VarChar(255)
+  esartista                 Boolean                     @default(false)
+  artista                   artista?
+  usuario_cesta_elemento    usuario_cesta_elemento[]
+  usuario_desea_elemento    usuario_desea_elemento[]
+  usuario_favorito_elemento usuario_favorito_elemento[]
+  usuario_tiene_elemento    usuario_tiene_elemento[]
+}
+
+model usuario_cesta_elemento {
+  idusuario  Int     @db.SmallInt
+  idelemento Int     @db.SmallInt
+  usuario    usuario @relation(fields: [idusuario], references: [id], onDelete: Cascade, map: "fk_usuarioelemcom")
+
+  @@id([idusuario, idelemento])
+}
+
+model usuario_desea_elemento {
+  idusuario  Int       @db.SmallInt
+  idelemento Int       @db.SmallInt
+  fecha      DateTime? @default(now()) @db.Timestamp(6)
+  usuario    usuario   @relation(fields: [idusuario], references: [id], onDelete: Cascade, map: "fk_usuarioelemdes")
+
+  @@id([idusuario, idelemento])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model usuario_favorito_elemento {
+  idusuario  Int       @db.SmallInt
+  idelemento Int       @db.SmallInt
+  tipo       Int       @default(0) @db.SmallInt
+  fecha      DateTime? @default(now()) @db.Timestamp(6)
+  usuario    usuario   @relation(fields: [idusuario], references: [id], onDelete: Cascade, map: "fk_usuarioart")
+
+  @@id([idusuario, idelemento, tipo])
+}
+
+model usuario_tiene_elemento {
+  idusuario  Int       @db.SmallInt
+  idelemento Int       @db.SmallInt
+  fecha      DateTime? @default(now()) @db.Timestamp(6)
+  usuario    usuario   @relation(fields: [idusuario], references: [id], onDelete: Cascade, map: "fk_usuarioelemtie")
+
+  @@id([idusuario, idelemento])
+}
