@@ -74,4 +74,71 @@ export const CompradoDAO = {
     });
   },
 
+  /**
+   * Obtiene todos los elementos que un usuario ha comprado.
+   *
+   * @async
+   * @function findAllByUsuario
+   * @memberof CompradoDAO
+   *
+   * @param {number} idusuario - ID del usuario.
+   * @returns {Promise<Array<object>>} Lista detallada de compras, incluyendo usuario.
+   *
+   * @example
+   * const compras = await CompradoDAO.findAllByUsuario(5);
+   */
+  async findAllByUsuario(idusuario) {
+    return prisma.usuario_tiene_elemento.findMany({
+      where: { idusuario },
+      include: {
+        usuario: {
+          select: { id: true, nombreusuario: true, correo: true },
+        },
+      },
+      orderBy: { fecha: 'desc' },
+    });
+  },
+
+  /**
+   * Busca si un usuario ya posee un elemento concreto.
+   *
+   * @async
+   * @function findOne
+   * @memberof CompradoDAO
+   *
+   * @param {number} idusuario - ID del usuario.
+   * @param {number} idelemento - ID del elemento.
+   *
+   * @returns {Promise<object|null>} Registro encontrado o `null`.
+   *
+   * @example
+   * const existe = await CompradoDAO.findOne(12, 9);
+   */
+  async findOne(idusuario, idelemento) {
+    return prisma.usuario_tiene_elemento.findUnique({
+      where: { idusuario_idelemento: { idusuario, idelemento } },
+    });
+  },
+
+  /**
+   * Obtiene todos los registros de compra.  
+   * **Solo recomendado para administración o depuración.**
+   *
+   * @async
+   * @function findAll
+   * @memberof CompradoDAO
+   *
+   * @returns {Promise<Array<object>>} Lista completa de registros de compras.
+   *
+   * @example
+   * const all = await CompradoDAO.findAll();
+   */
+  async findAll() {
+    return prisma.usuario_tiene_elemento.findMany({
+      include: {
+        usuario: { select: { id: true, nombreusuario: true } },
+      },
+      orderBy: [{ idusuario: 'asc' }, { fecha: 'desc' }],
+    });
+  },
 };
