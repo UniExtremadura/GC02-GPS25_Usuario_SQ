@@ -28,4 +28,20 @@ const router = Router();
 router.post('/', verifyFirebaseToken, CestaController.createItemCesta);
 
 
+/**
+ * @route DELETE /api/usuarios/cesta/:idusuario/:idelemento
+ * @description
+ * Elimina un elemento de la cesta del usuario.  
+ * Si no existe, devuelve 404.  
+ * Si se elimina correctamente, responde con 204 sin contenido.
+ *
+ * @access Privado (requiere JWT Firebase)
+ * @param {number} idusuario - ID del usuario.
+ * @param {number} idelemento - ID del elemento a eliminar.
+ *
+ * @returns {void|ErrorResponseDTO}
+ */
+router.delete('/:idusuario/:idelemento', verifyFirebaseToken, CestaController.deleteItemCesta);
+
+
 export default router;

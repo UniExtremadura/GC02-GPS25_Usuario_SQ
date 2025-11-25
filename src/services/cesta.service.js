@@ -56,4 +56,37 @@ export const CestaService = {
     }
   },
 
+  /**
+   * Elimina un elemento de la cesta del usuario.
+   *
+   * @async
+   * @function deleteItemCesta
+   * @param {number} idusuario - ID del usuario.
+   * @param {number} idelemento - ID del elemento.
+   * @returns {Promise<UsuarioCestaElementoDTO|null>}  
+   * - DTO de la relación eliminada,  
+   * - `null` si no existe.
+   *
+   * @description
+   * Comprueba si la relación existe y, si es así, la elimina.
+   *
+   * @throws {ErrorResponseDTO} Error interno al intentar eliminar.
+   */
+  async deleteItemCesta(idusuario, idelemento) {
+    try {
+      const existe = await CestaDAO.findOne(idusuario, idelemento);
+      if (!existe) return null;
+
+      const eliminado = await CestaDAO.delete(idusuario, idelemento);
+      return new UsuarioCestaElementoDTO(eliminado);
+
+    } catch (error) {
+      throw new ErrorResponseDTO({
+        code: 500,
+        message: "Error interno al eliminar el elemento de la cesta.",
+        path: `/cesta/${idusuario}/${idelemento}`,
+      });
+    }
+  },
+
 };

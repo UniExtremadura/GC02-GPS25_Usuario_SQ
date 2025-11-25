@@ -77,4 +77,61 @@ export const CestaController = {
     }
   },
 
+  /**
+   * Elimina un elemento de la cesta del usuario.
+   *
+   * @async
+   * @function deleteItemCesta
+   * @route DELETE /cesta/:idusuario/:idelemento
+   * @description Elimina la relación si existe.  
+   * Si elimina correctamente → 204 sin contenido.
+   *
+   * @param {import('express').Request} req
+   * @param {import('express').Response} res
+   *
+   * @returns {Promise<void|ErrorResponseDTO>}
+   *
+   * @response 204 - Eliminado correctamente.
+   * @response 401 - Token inválido (middleware previo).
+   * @response 403 - ID no coincide con el usuario autenticado (middleware previo).
+   * @response 404 - El elemento no existe en la cesta.
+   * @response 500 - Error interno del servidor.
+   */
+  async deleteItemCesta(req, res) {
+    try {
+      const idusuario = parseInt(req.params.idusuario);
+      const idelemento = parseInt(req.params.idelemento);
+
+      const eliminado = await CestaService.deleteItemCesta(idusuario, idelemento);
+
+      if (!eliminado) {
+        return res.status(404).json(
+          new ErrorResponseDTO({
+            code: 404,
+            message: `Elemento o usuario no encontrado en la cesta.`,
+            path: req.originalUrl,
+          })
+        );
+      }
+
+      res.status(204).end();
+
+    } catch (error) {
+      console.error(error);
+
+      if (error instanceof ErrorResponseDTO) {
+        return res.status(error.code).json(error);
+      }
+
+      res.status(500).json(
+        new ErrorResponseDTO({
+          code: 500,
+          message: `Error interno al eliminar el elemento de la cesta.`,
+          path: req.originalUrl,
+        })
+      );
+    }
+  },
+
+
 };
