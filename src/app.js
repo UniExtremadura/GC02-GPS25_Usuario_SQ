@@ -10,6 +10,7 @@ import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "./config/swagger.js";
 
 import usuarioRoutes from './routes/usuario.routes.js';
+import cestaRoutes from './routes/cesta.routes.js';
 import compradoRoutes from './routes/comprado.routes.js';
 
 dotenv.config(); // Cargamos las variables
@@ -20,6 +21,7 @@ console.log('DB URL:', process.env.DATABASE_URL); //ver que base de datos emplea
 
 app.use(express.json()); //habilita que use json en las peticiones
 
+app.use('/api/usuarios/cesta', cestaRoutes);
 app.use('/api/usuarios/tiene', compradoRoutes);
 app.use('/api/usuarios', usuarioRoutes);
 
