@@ -86,6 +86,42 @@ export const UsuarioController = {
       }));
     }
   },
+
+  /**
+  * Actualiza el perfil del usuario autenticado. El ID viene en el body y el
+  * middleware se encarga de comprobar coincidencia con el token.
+  * @async
+  * @function updateUsuario
+  * @route PUT /api/usuarios/
+  * @param {import('express').Request} req
+  * @param {import('express').Response} res
+  * @returns {Promise<UsuarioDTO|ArtistaDTO|ErrorResponseDTO>}
+  * @response 200 - Usuario actualizado correctamente.
+  * @response 400 - Datos faltantes o inválidos en el body.
+  * @response 401 - Token inválido (middleware previo).
+  * @response 403 - Usuario no autorizado (middleware previo).
+  * @response 404 - Usuario no encontrado.
+  * @response 500 - Error interno al actualizar usuario.
+  */
+  async updateUsuario(req, res) {
+    try {
+      const body = req.body;
+      if (!body || !body.id) {
+        return res.status(400).json(new ErrorResponseDTO({ code: 400, message: 'Faltan datos del usuario.', path: req.originalUrl }));
+      }
+
+      const data = await UsuarioService.updateUsuario(body);
+      if (!data) {
+        return res.status(404).json(new ErrorResponseDTO({ code: 404, message: 'Usuario no encontrado.', path: req.originalUrl }));
+      }
+
+      res.status(200).json(data);
+    } catch (error) {
+      console.error(error);
+      if (error instanceof ErrorResponseDTO) return res.status(error.code).json(error);
+      res.status(500).json(new ErrorResponseDTO({ code: 500, message: 'Error al actualizar usuario.', path: req.originalUrl }));
+    }
+  },
   
   /**
    * Crea un nuevo usuario (autenticado externamente). Regresa 201 y Location.
