@@ -122,6 +122,38 @@ export const UsuarioController = {
       res.status(500).json(new ErrorResponseDTO({ code: 500, message: 'Error al actualizar usuario.', path: req.originalUrl }));
     }
   },
+
+  /**
+  * Elimina el usuario autenticado. Se espera que el middleware haya validado
+  * que :id coincide con req.user.uid.
+  * @async
+  * @function deleteUsuario
+  * @route DELETE /api/usuarios/:id
+  * @param {import('express').Request} req
+  * @param {import('express').Response} res
+  * @returns {Promise<void|ErrorResponseDTO>}
+  * @response 204 - Usuario eliminado correctamente (sin contenido).
+  * @response 400 - ID inválido.
+  * @response 401 - Token inválido (middleware previo).
+  * @response 403 - Usuario no autorizado (middleware previo).
+  * @response 404 - Usuario no encontrado.
+  * @response 500 - Error interno al eliminar usuario.
+  */
+  async deleteUsuario(req, res) {
+    try {
+      const id = parseInt(req.params.id ?? req.user?.uid);
+      if (Number.isNaN(id)) {
+        return res.status(400).json(new ErrorResponseDTO({ code: 400, message: 'ID inválido.', path: req.originalUrl }));
+      }
+
+      await UsuarioService.deleteUsuario(id);
+      res.status(204).end();
+    } catch (error) {
+      console.error(error);
+      if (error instanceof ErrorResponseDTO) return res.status(error.code).json(error);
+      res.status(500).json(new ErrorResponseDTO({ code: 500, message: 'Error al eliminar usuario.', path: req.originalUrl }));
+    }
+  },
   
   /**
    * Crea un nuevo usuario (autenticado externamente). Regresa 201 y Location.

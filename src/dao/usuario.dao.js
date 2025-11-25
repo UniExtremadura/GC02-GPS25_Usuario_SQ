@@ -97,4 +97,24 @@ export const UsuarioDAO = {
     });
   },
 
+  /**
+   * Elimina un usuario de la base de datos.
+   *
+   * @async
+   * @function delete
+   * @memberof UsuarioDAO
+   *
+   * @param {number|string} id - ID del usuario.
+   * @param {PrismaClient|TransactionClient} [tx=prisma] - Cliente o transacción.
+   * @returns {Promise<object>} Usuario eliminado.
+   *
+   * @example
+   * await UsuarioDAO.delete(12);
+   */
+  async delete(id, tx = prisma) {
+    return tx.usuario.delete({
+      where: { id: Number(id) }
+    });
+  }
+
 };

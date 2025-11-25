@@ -161,4 +161,34 @@ export const UsuarioService = {
     }
   },
 
+  /**
+   * Elimina un usuario y su registro en Firebase dentro de una transacción.
+   * @async
+   * @function deleteUsuario
+   * @param {number} id
+   * @returns {Promise<UsuarioDTO>}
+   */
+  async deleteUsuario(id) {
+    try {
+      return await prisma.$transaction(async (tx) => {
+        let deletedUsuario = await UsuarioDAO.delete(id, tx);
+        if (!deletedUsuario) throw new ErrorResponseDTO({ code: 404, message: 'Usuario no encontrado', path: `/usuarios/${id}` });
+
+        try {
+          await firebaseAdmin.auth().deleteUser(String(deletedUsuario.id));
+        } catch (firebaseError) {
+          console.error('Error al eliminar usuario en Firebase:', firebaseError);
+          // Reintentar o decidir política: en este diseño hacemos rollback lanzando error
+          throw new Error('Error al eliminar usuario en Firebase');
+        }
+
+        return new UsuarioDTO(deletedUsuario);
+      });
+    } catch (error) {
+      console.error(error);
+      if (error instanceof ErrorResponseDTO) throw error;
+      throw new ErrorResponseDTO({ code: 500, message: 'Error al eliminar usuario en Firebase o Base de Datos', path: `/usuarios/${id}` });
+    }
+  },
+
 };

@@ -28,6 +28,15 @@ router.get('/login', verifyFirebaseToken, UsuarioController.getLogin);  //Endpoi
 router.get('/logout', verifyFirebaseToken, UsuarioController.getLogout);  //Endpoint privado
 
 /**
+ * @route DELETE /api/usuarios/:id
+ * @description Elimina un usuario según su ID. El ID debe coincidir con el usuario del token.
+ * @access Privado (requiere JWT Firebase)
+ * @param {number} id - ID del usuario a eliminar.
+ * @returns {void|ErrorResponseDTO} Sin contenido si la eliminación es correcta.
+ */
+router.delete('/:id', verifyFirebaseToken, UsuarioController.deleteUsuario);  //Endpoint privado
+
+/**
  * @route POST /api/usuarios/
  * @description Crea un nuevo usuario autenticado externamente y lo registra en la base de datos.
  * @access Público
