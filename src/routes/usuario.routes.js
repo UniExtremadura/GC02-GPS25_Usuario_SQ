@@ -20,6 +20,14 @@ const router = Router();
 router.get('/login', verifyFirebaseToken, UsuarioController.getLogin);  //Endpoint privado
 
 /**
+ * @route GET /api/usuarios/logout
+ * @description Realiza el cierre de sesión del usuario autenticado.
+ * @access Privado (requiere JWT Firebase)
+ * @returns {void|ErrorResponseDTO} Confirmación de cierre de sesión.
+ */
+router.get('/logout', verifyFirebaseToken, UsuarioController.getLogout);  //Endpoint privado
+
+/**
  * @route POST /api/usuarios/
  * @description Crea un nuevo usuario autenticado externamente y lo registra en la base de datos.
  * @access Público

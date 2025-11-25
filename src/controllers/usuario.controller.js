@@ -55,6 +55,37 @@ export const UsuarioController = {
       }));
     }
   },
+
+  /**
+  * Realiza logout/revoca tokens del usuario autenticado.
+  * @async
+  * @function getLogout
+  * @route GET /api/usuarios/logout
+  * @param {import('express').Request} req
+  * @param {import('express').Response} res
+  * @returns {Promise<boolean|ErrorResponseDTO>}
+  * @response 200 - Logout realizado correctamente.
+  * @response 400 - UID no proporcionado.
+  * @response 401 - Token inválido (middleware previo).
+  * @response 403 - Usuario no autorizado (middleware previo).
+  * @response 500 - Error interno al revocar tokens.
+  */
+  async getLogout(req, res) {
+    try {
+      const uid = req.user?.uid;
+      if (!uid) return res.status(400).json(new ErrorResponseDTO({ code: 400, message: 'UID no proporcionado', path: req.originalUrl }));
+
+      await UsuarioService.logout(String(uid));
+      res.status(200).json(true);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json(new ErrorResponseDTO({
+        code: 500,
+        message: 'Error al eliminar el token.',
+        path: req.originalUrl,
+      }));
+    }
+  },
   
   /**
    * Crea un nuevo usuario (autenticado externamente). Regresa 201 y Location.
