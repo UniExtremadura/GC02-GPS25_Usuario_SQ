@@ -36,4 +36,13 @@ router.get('/logout', verifyFirebaseToken, UsuarioController.getLogout);  //Endp
  */
 router.post('/', UsuarioController.createUsuario);
 
+/**
+ * @route PUT /api/usuarios/
+ * @description Modifica los datos del usuario autenticado. El usuario se identifica mediante JWT.
+ * @access Privado (requiere JWT Firebase)
+ * @body {UsuarioDTO} Datos actualizados.
+ * @returns {UsuarioDTO|ArtistaDTO|ErrorResponseDTO} Usuario actualizado.
+ */
+router.put('/', verifyFirebaseToken, UsuarioController.updateUsuario);  //Endpoint privado
+
 export default router;

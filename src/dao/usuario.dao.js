@@ -73,4 +73,28 @@ export const UsuarioDAO = {
     return tx.usuario.create({ data });
   },
 
+  /**
+   * Actualiza los datos de un usuario existente.
+   * El campo `id` se separa para evitar su modificación.
+   *
+   * @async
+   * @function update
+   * @memberof UsuarioDAO
+   *
+   * @param {object} data - Objeto con los datos a actualizar (incluye `id`).
+   * @param {PrismaClient|TransactionClient} [tx=prisma] - Cliente o transacción de Prisma.
+   * @returns {Promise<object>} Usuario actualizado.
+   *
+   * @example
+   * await UsuarioDAO.update({ id: 10, correo: "nuevo@mail.com" });
+   */
+  async update(data, tx = prisma) {
+    const { id, ...updateData } = data;
+
+    return tx.usuario.update({
+      where: { id },
+      data: updateData,
+    });
+  },
+
 };

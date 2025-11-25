@@ -115,5 +115,50 @@ export const UsuarioService = {
     }
   },
 
+  /**
+   * Actualiza usuario y artista (si aplica).
+   * @async
+   * @function updateUsuario
+   * @param {Object} data
+   * @returns {Promise<UsuarioDTO|ArtistaDTO|null>}
+   */
+  async updateUsuario(data) {
+    try {
+      const existArt = await ArtistaDAO.findById(data.id);
+      const [usuarioData, artistaData] = separarDataUsuarioArtista(data, !!existArt);
+
+      usuarioData.id = data.id;
+      const usuario = await UsuarioDAO.update(usuarioData);
+      if (!usuario) return null;
+
+      if (!existArt) return new UsuarioDTO(usuario);
+
+      if (artistaData) {
+        artistaData.idusuario = data.id;
+        await ArtistaDAO.update(artistaData);
+      }
+
+      const usuarioFinal = await UsuarioDAO.findById(data.id);
+      if (!usuarioFinal.artista || !usuarioFinal.artista.idgenero) {
+        return new ArtistaDTO({ ...usuarioFinal, genero: null });
+      }
+
+      const url = `${process.env.API_CONTENIDO}/generos/${usuarioFinal.artista.idgenero}`;
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(`Error al obtener el género ${usuarioFinal.artista.idgenero}`);
+      }
+
+      const genero = await response.json();
+      return new ArtistaDTO({
+        ...usuarioFinal,
+        genero
+      });
+    } catch (error) {
+      console.error(error);
+      throw new ErrorResponseDTO({ code: 500, message: 'Error al actualizar usuario.', path: `/usuarios` });
+    }
+  },
 
 };
