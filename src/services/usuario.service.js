@@ -98,5 +98,22 @@ export const UsuarioService = {
     }
   },
 
+  /**
+   * Logout: revoca tokens del usuario en Firebase.
+   * @async
+   * @function logout
+   * @param {string} uid
+   * @returns {Promise<boolean>}
+   */
+  async logout(uid) {
+    try {
+      await firebaseAdmin.auth().revokeRefreshTokens(String(uid));
+      return true;
+    } catch (error) {
+      console.error(error);
+      throw new ErrorResponseDTO({ code: 500, message: 'Error al eliminar el token', path: `/usuarios/logout` });
+    }
+  },
+
 
 };
