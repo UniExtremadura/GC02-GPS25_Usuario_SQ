@@ -116,5 +116,4 @@ export const UsuarioDAO = {
       where: { id: Number(id) }
     });
   }
-
 };
