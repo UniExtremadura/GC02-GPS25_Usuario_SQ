@@ -11,6 +11,22 @@ import { CestaController } from '../controllers/cesta.controller.js';
 const router = Router();
 
 /**
+ * @route GET /api/usuarios/cesta/:idusuario
+ * @description
+ * Obtiene todos los elementos que el usuario tiene agregados en su cesta.
+ * La respuesta incluye los elementos detallados (nombre, imagen, precio, tipo)
+ * y el total acumulado. La información se complementa con la API de Contenido.
+ * 
+ * @access Privado (requiere JWT Firebase)
+ * @param {number} idusuario - ID del usuario.
+ * 
+ * @returns {CestaDTO|ErrorResponseDTO}
+ * Devuelve la cesta completa del usuario o un error correspondiente.
+ */
+router.get('/:idusuario', verifyFirebaseToken, CestaController.getCestaByUser);
+
+
+/**
  * @route POST /api/usuarios/cesta
  * @description
  * Añade un nuevo elemento a la cesta del usuario.  
@@ -26,6 +42,21 @@ const router = Router();
  * Devuelve la relación creada o un error.
  */
 router.post('/', verifyFirebaseToken, CestaController.createItemCesta);
+
+
+/**
+ * @route GET /api/usuarios/cesta/:idusuario/:idelemento
+ * @description
+ * Verifica si un elemento concreto se encuentra en la cesta del usuario.
+ * 
+ * @access Privado (requiere JWT Firebase)
+ * @param {number} idusuario - ID del usuario.
+ * @param {number} idelemento - ID del elemento a comprobar.
+ * 
+ * @returns {boolean|ErrorResponseDTO}
+ * Indica si el elemento está en la cesta.
+ */
+router.get('/:idusuario/:idelemento', verifyFirebaseToken, CestaController.existItemCesta);
 
 
 /**

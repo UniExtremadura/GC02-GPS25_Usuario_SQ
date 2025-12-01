@@ -41,6 +41,7 @@ Estas son las variables necesarias:
 ```bash
 # Puerto donde correrá el servidor
 PORT=3000
+PORT_CORS="http://localhost:3333"
 
 # Cadena de conexión a PostgreSQL
 DATABASE_URL=postgresql://user:password@localhost:5432/mydatabase
@@ -142,6 +143,7 @@ curl -X POST http://localhost:3000/api/usuarios/tiene/18 \
 
 ```bash
 src/
+├── pruebas/          # Archivo .json para importar endpoint del microservicio
 ├── config/           # Configuración de Firebase, Prisma y entorno
 ├── controllers/      # Controladores HTTP
 ├── dao/              # Acceso a datos (Prisma)

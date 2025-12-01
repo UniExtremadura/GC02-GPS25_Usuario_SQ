@@ -4,6 +4,7 @@
  * actualizar y eliminar. Interactúa con DAOs, Firebase y APIs externas.
  */
 
+import { UsuarioDAO } from '../dao/usuario.dao.js';
 import { ArtistaDAO } from '../dao/artista.dao.js';
 import { UsuarioDTO, UsuarioPublicDTO } from '../dto/usuario.dto.js';
 import { ArtistaDTO } from '../dto/artista.dto.js';
@@ -13,34 +14,41 @@ import { firebaseAdmin } from '../config/firebase.js';
 import { separarDataUsuarioArtista } from '../utils/separarDataUsuarioArtista.js';
 
 export const UsuarioService = {
+
   /**
-   * Obtiene un usuario completo por id (incluye datos de artista y género si aplica).
+   * Obtiene la lista de usuarios. Resuelve correctamente promesas anidadas con Promise.all.
    * @async
-   * @function obtenerUsuario
-   * @param {number} id
-   * @returns {Promise<UsuarioDTO|ArtistaDTO|null>}
+   * @function listarUsuarios
+   * @returns {Promise<Array<UsuarioDTO|ArtistaDTO>>}
+   * @throws {ErrorResponseDTO}
    */
-  async obtenerUsuario(id) {
+  async listarUsuarios() {
     try {
-      const usuario = await UsuarioDAO.findById(id);
-      if (!usuario) return null;
+      const usuarios = await UsuarioDAO.findAll();
+      if (!usuarios?.length) return [];
 
-      if (!usuario.esartista) return new UsuarioDTO(usuario);
+      const elementos = await Promise.all(usuarios.map(async (user) => {
+        if (!user.esartista) return new UsuarioDTO(user);
 
-      if (!usuario.artista || !usuario.artista.idgenero) return new ArtistaDTO({ ...usuario, genero: null });
+        // si es artista pero no tiene idgenero, devolvemos ArtistaDTO con genero null
+        if (!user.artista || !user.artista.idgenero) return new ArtistaDTO({ ...user, genero: null });
 
-      const url = `${process.env.API_CONTENIDO}/generos/${usuario.artista.idgenero}`;
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`Error al obtener el género ${usuario.artista.idgenero}`);
-      const genero = await response.json();
+        // obtener género desde microservicio de contenidos
+        const url = `${process.env.API_CONTENIDO}/generos/${user.artista.idgenero}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Error al obtener el género ${user.artista.idgenero}`);
+        const genero = await response.json();
 
-      return new ArtistaDTO({ ...usuario, genero });
+        return new ArtistaDTO({ ...user, genero });
+      }));
+
+      return elementos;
     } catch (error) {
       console.error(error);
-      throw new ErrorResponseDTO({ code: 500, message: 'Error al obtener usuario.', path: `/usuarios/${id}` });
+      throw new ErrorResponseDTO({ code: 500, message: 'Error interno al obtener la lista de usuarios.', path: '/usuarios' });
     }
-  },  
-  
+  },
+
   /**
    * Crea un usuario y su artista asociado (si aplica) en una transacción.
    * - Separa los datos de usuario y artista.
@@ -95,6 +103,34 @@ export const UsuarioService = {
       // si es un ErrorResponseDTO ya lanzado, propagarlo; si no, envolverlo
       if (error instanceof ErrorResponseDTO) throw error;
       throw new ErrorResponseDTO({ code: 500, message: 'Error al crear usuario en Firebase o Base de Datos.', path: '/usuarios' });
+    }
+  },
+
+  /**
+   * Obtiene un usuario completo por id (incluye datos de artista y género si aplica).
+   * @async
+   * @function obtenerUsuario
+   * @param {number} id
+   * @returns {Promise<UsuarioDTO|ArtistaDTO|null>}
+   */
+  async obtenerUsuario(id) {
+    try {
+      const usuario = await UsuarioDAO.findById(id);
+      if (!usuario) return null;
+
+      if (!usuario.esartista) return new UsuarioDTO(usuario);
+
+      if (!usuario.artista || !usuario.artista.idgenero) return new ArtistaDTO({ ...usuario, genero: null });
+
+      const url = `${process.env.API_CONTENIDO}/generos/${usuario.artista.idgenero}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Error al obtener el género ${usuario.artista.idgenero}`);
+      const genero = await response.json();
+
+      return new ArtistaDTO({ ...usuario, genero });
+    } catch (error) {
+      console.error(error);
+      throw new ErrorResponseDTO({ code: 500, message: 'Error al obtener usuario.', path: `/usuarios/${id}` });
     }
   },
 
@@ -188,6 +224,40 @@ export const UsuarioService = {
       console.error(error);
       if (error instanceof ErrorResponseDTO) throw error;
       throw new ErrorResponseDTO({ code: 500, message: 'Error al eliminar usuario en Firebase o Base de Datos', path: `/usuarios/${id}` });
+    }
+  },
+
+  /**
+   * Lista usuarios públicos (DTO que oculta campos sensibles).
+   * @async
+   * @function listarUsuariosPubli
+   * @returns {Promise<Array<UsuarioPublicDTO>>}
+   */
+  async listarUsuariosPubli() {
+    try {
+      const usuarios = await UsuarioDAO.findAll();
+      return usuarios.map(u => new UsuarioPublicDTO(u));
+    } catch (error) {
+      console.error(error);
+      throw new ErrorResponseDTO({ code: 500, message: 'Error al listar usuarios públicos', path: '/usuarios' });
+    }
+  },
+
+  /**
+   * Obtiene la información pública de un usuario por id.
+   * @async
+   * @function obtenerUsuarioPubli
+   * @param {number} id
+   * @returns {Promise<UsuarioPublicDTO|null>}
+   */
+  async obtenerUsuarioPubli(id) {
+    try {
+      const usuario = await UsuarioDAO.findById(id);
+      if (!usuario) return null;
+      return new UsuarioPublicDTO(usuario);
+    } catch (error) {
+      console.error(error);
+      throw new ErrorResponseDTO({ code: 500, message: 'Error al obtener usuario público', path: `/usuarios/${id}` });
     }
   },
 
