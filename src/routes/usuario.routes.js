@@ -37,6 +37,23 @@ router.get('/logout', verifyFirebaseToken, UsuarioController.getLogout);  //Endp
 router.delete('/:id', verifyFirebaseToken, UsuarioController.deleteUsuario);  //Endpoint privado
 
 /**
+ * @route GET /api/usuarios/:id
+ * @description Obtiene la información pública de un usuario según su ID.
+ * @access Público
+ * @param {number} id - ID del usuario.
+ * @returns {UsuarioPublicDTO|ErrorResponseDTO} Datos públicos del usuario.
+ */
+router.get('/:id', UsuarioController.getUsuarioPubliById); //Endpoint publico pruebas
+
+/**
+ * @route GET /api/usuarios/
+ * @description Obtiene la lista de usuarios públicos almacenados.
+ * @access Público
+ * @returns {Array<UsuarioPublicDTO>|ErrorResponseDTO} Lista de usuarios.
+ */
+router.get('/', UsuarioController.getUsuariosPubli); //Endpoint publico pruebas
+
+/**
  * @route POST /api/usuarios/
  * @description Crea un nuevo usuario autenticado externamente y lo registra en la base de datos.
  * @access Público

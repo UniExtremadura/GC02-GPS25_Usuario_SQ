@@ -15,7 +15,69 @@ import prisma from '../config/database.js';
  * @description Encapsula todas las operaciones CRUD relacionadas con los elementos favoritos de un usuario.
  */
 export const FavoritoDAO = {
-  
+
+  /**
+   * Obtiene todos los elementos favoritos asociados a un usuario.
+   *
+   * @async
+   * @function findAllByUsuario
+   * @memberof FavoritoDAO
+   *
+   * @param {number} idusuario - ID del usuario.
+   * @returns {Promise<Array<object>>} Lista de registros favoritos del usuario.
+   *
+   * @example
+   * const favoritos = await FavoritoDAO.findAllByUsuario(5);
+   */
+  async findAllByUsuario(idusuario) {
+    return prisma.usuario_favorito_elemento.findMany({
+      where: { idusuario },
+    });
+  },
+
+  /**
+   * Busca si un usuario tiene un elemento marcado como favorito.
+   *
+   * @async
+   * @function findOne
+   * @memberof FavoritoDAO
+   *
+   * @param {number} idusuario - ID del usuario.
+   * @param {number} idelemento - ID del elemento.
+   * @param {Array<number>} tipo - Lista de tipos permitidos (por ejemplo: [1,2]).
+   * @returns {Promise<object|null>} El favorito encontrado o `null` si no existe.
+   *
+   * @example
+   * const fav = await FavoritoDAO.findOne(5, 12, [1]);
+   */
+  async findOne(idusuario, idelemento, tipo) {
+    return prisma.usuario_favorito_elemento.findFirst({
+      where: { idusuario, idelemento, tipo: { in: tipo } },
+    });
+  },
+
+  /**
+   * Elimina un elemento de la lista de favoritos del usuario.
+   *
+   * @async
+   * @function delete
+   * @memberof FavoritoDAO
+   *
+   * @param {number} idusuario - ID del usuario.
+   * @param {number} idelemento - ID del elemento.
+   * @param {Array<number>} tipo - Tipos permitidos a eliminar.
+   * @returns {Promise<object>} Resultado de la operación (`count` indica cuántos registros se eliminaron).
+   *
+   * @example
+   * const result = await FavoritoDAO.delete(5, 10, [1]);
+   * console.log(result.count); // → 1 si se eliminó
+   */
+  async delete(idusuario, idelemento, tipo) {
+    return prisma.usuario_favorito_elemento.deleteMany({
+      where: { idusuario, idelemento, tipo: { in: tipo } },
+    });
+  },
+
   /**
    * Crea un nuevo registro en la lista de favoritos.
    *

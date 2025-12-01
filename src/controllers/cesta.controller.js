@@ -8,6 +8,48 @@ import { CestaService } from '../services/cesta.service.js';
 import { ErrorResponseDTO } from '../dto/errorResponse.dto.js';
 
 export const CestaController = {
+
+  /**
+   * Obtiene todos los elementos de la cesta del usuario.
+   *
+   * @async
+   * @function getCestaByUser
+   * @route GET /cesta/:idusuario
+   * @description Devuelve la cesta completa del usuario, incluyendo los elementos y el total calculado.
+   * Combina información de la base de datos con datos del servicio de Contenido.
+   *
+   * @param {import('express').Request} req - Petición HTTP.
+   * @param {import('express').Response} res - Respuesta HTTP.
+   *
+   * @returns {Promise<CestaDTO|ErrorResponseDTO>}
+   *
+   * @response 200 - Cesta del usuario, incluso si está vacía.
+   * @response 401 - Token inválido o no autorizado (middleware previo).
+   * @response 403 - ID de parámetros no coincide con el usuario autenticado (middleware previo).
+   * @response 500 - Error interno del servidor.
+   */
+  async getCestaByUser(req, res) {
+    try {
+      const idusuario = parseInt(req.params.idusuario);
+      const data = await CestaService.getCestaByUser(idusuario);
+      res.status(200).json(data);
+    } catch (error) {
+      console.error(error);
+
+      if (error instanceof ErrorResponseDTO) {
+        return res.status(error.code).json(error);
+      }
+
+      res.status(500).json(
+        new ErrorResponseDTO({
+          code: 500,
+          message: `Error interno al obtener la cesta del usuario.`,
+          path: req.originalUrl,
+        })
+      );
+    }
+  },
+
   /**
    * Crea una nueva relación usuario-elemento dentro de la cesta.
    *
@@ -78,6 +120,50 @@ export const CestaController = {
   },
 
   /**
+   * Verifica si un elemento está en la cesta del usuario.
+   *
+   * @async
+   * @function existItemCesta
+   * @route GET /cesta/:idusuario/:idelemento
+   * @description Comprueba si un usuario ha añadido un elemento a su cesta.
+   *
+   * @param {import('express').Request} req
+   * @param {import('express').Response} res
+   *
+   * @returns {Promise<boolean|ErrorResponseDTO>}
+   *
+   * @response 200 - Devuelve `{ isInCesta: boolean }`.
+   * @response 401 - Token inválido (middleware previo).
+   * @response 403 - ID no coincide con el usuario autenticado (middleware previo).
+   * @response 500 - Error interno del servidor.
+   */
+  async existItemCesta(req, res) {
+    try {
+      const idusuario = parseInt(req.params.idusuario);
+      const idelemento = parseInt(req.params.idelemento);
+
+      const isInCesta = await CestaService.existItemCesta(idusuario, idelemento);
+
+      res.status(200).json( isInCesta );
+
+    } catch (error) {
+      console.error(error);
+
+      if (error instanceof ErrorResponseDTO) {
+        return res.status(error.code).json(error);
+      }
+
+      res.status(500).json(
+        new ErrorResponseDTO({
+          code: 500,
+          message: `Error interno al verificar el estado del elemento en la cesta.`,
+          path: req.originalUrl,
+        })
+      );
+    }
+  },
+
+  /**
    * Elimina un elemento de la cesta del usuario.
    *
    * @async
@@ -132,6 +218,5 @@ export const CestaController = {
       );
     }
   },
-
 
 };
