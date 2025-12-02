@@ -58,6 +58,7 @@ export const CestaService = {
 
       return new CestaDTO({ items });
     } catch (error) {
+      console.error(error);
       throw new ErrorResponseDTO({
         code: 500,
         message: "Error interno al obtener la cesta del usuario.",
@@ -85,6 +86,7 @@ export const CestaService = {
       const existe = await CestaDAO.findOne(idusuario, idelemento);
       return !!existe;
     } catch (error) {
+      console.error(error);
       throw new ErrorResponseDTO({
         code: 500,
         message: "Error interno al verificar si el elemento está en la cesta.",
@@ -118,6 +120,7 @@ export const CestaService = {
       return new UsuarioCestaElementoDTO(eliminado);
 
     } catch (error) {
+      console.error(error);
       throw new ErrorResponseDTO({
         code: 500,
         message: "Error interno al eliminar el elemento de la cesta.",
@@ -158,6 +161,7 @@ export const CestaService = {
       return new UsuarioCestaElementoDTO(creado);
 
     } catch (error) {
+      console.error(error);
 
       // Si ya es un error controlado → lanzarlo tal cual
       if (error instanceof ErrorResponseDTO) {

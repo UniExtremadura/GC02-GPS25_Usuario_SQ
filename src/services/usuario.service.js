@@ -100,6 +100,7 @@ export const UsuarioService = {
 
       return result;
     } catch (error) {
+      console.error(error);
       // si es un ErrorResponseDTO ya lanzado, propagarlo; si no, envolverlo
       if (error instanceof ErrorResponseDTO) throw error;
       throw new ErrorResponseDTO({ code: 500, message: 'Error al crear usuario en Firebase o Base de Datos.', path: '/usuarios' });

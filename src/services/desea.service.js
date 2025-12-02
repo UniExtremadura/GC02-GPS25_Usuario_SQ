@@ -36,6 +36,7 @@ export const DeseaService = {
 
       return elementos;
     } catch (error) {
+      console.error(error);
       throw new ErrorResponseDTO({
         code: 500,
         message: "Error interno al obtener la lista de elementos deseados.",
@@ -55,6 +56,7 @@ export const DeseaService = {
       const existe = await DeseaDAO.findOne(idusuario, idelemento);
       return !!existe;
     } catch (error) {
+      console.error(error);
       throw new ErrorResponseDTO({
         code: 500,
         message: "Error interno al verificar si el elemento está en la lista de deseos.",
@@ -77,6 +79,7 @@ export const DeseaService = {
       const eliminado = await DeseaDAO.delete(idusuario, idelemento);
       return new UsuarioDeseaElementoDTO(eliminado);
     } catch (error) {
+      console.error(error);
       throw new ErrorResponseDTO({
         code: 500,
         message: "Error interno al eliminar el elemento deseado.",
@@ -104,6 +107,7 @@ export const DeseaService = {
       const creado = await DeseaDAO.create(data);
       return new UsuarioDeseaElementoDTO(creado);
     } catch (error) {
+      console.error(error);
       if (error instanceof ErrorResponseDTO) {
         throw error;
       }

@@ -47,6 +47,7 @@ export const CompradoService = {
 
       return elementos;
     } catch (error) {
+      console.error(error);
       throw new ErrorResponseDTO({
         code: 500,
         message: "Error interno al obtener los elementos comprados.",
@@ -76,6 +77,7 @@ export const CompradoService = {
       const result = await CompradoDAO.create(idusuario);
       return !!result;
     } catch (error) {
+      console.error(error);
       throw new ErrorResponseDTO({
         code: 500,
         message: "Error interno al registrar los elementos comprados.",
@@ -105,6 +107,7 @@ export const CompradoService = {
       const existe = await CompradoDAO.findOne(idusuario, idelemento);
       return !!existe;
     } catch (error) {
+      console.error(error);
       throw new ErrorResponseDTO({
         code: 500,
         message: "Error interno al verificar si el elemento ha sido comprado.",

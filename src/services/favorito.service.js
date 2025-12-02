@@ -69,6 +69,7 @@ export const FavoritoService = {
 
       return elementos;
     } catch (error) {
+      console.error(error);
       throw new ErrorResponseDTO({
         code: 500,
         message: "Error al obtener los elementos favoritos del usuario.",
@@ -94,6 +95,7 @@ export const FavoritoService = {
       const existe = await FavoritoDAO.findOne(idusuario, idelemento, tipo);
       return !!existe;
     } catch (error) {
+      console.error(error);
       throw new ErrorResponseDTO({
         code: 500,
         message: "Error al verificar si el artista es favorito.",
@@ -122,6 +124,7 @@ export const FavoritoService = {
       const eliminado = await FavoritoDAO.delete(idusuario, idelemento, tipo);
       return new UsuarioFavoritoElementoDTO(eliminado);
     } catch (error) {
+      console.error(error);
       throw new ErrorResponseDTO({
         code: 500,
         message: "Error al eliminar el artista de favoritos.",
@@ -146,7 +149,8 @@ export const FavoritoService = {
       const tipo = [1, 2];
       const existe = await FavoritoDAO.findOne(idusuario, idelemento, tipo);
       return !!existe;
-    } catch (_) {
+    } catch (error) {
+      console.error(error);
       throw new ErrorResponseDTO({
         code: 500,
         message: "Error al verificar si el contenido es favorito.",
@@ -175,6 +179,7 @@ export const FavoritoService = {
       const eliminado = await FavoritoDAO.delete(idusuario, idelemento, tipo);
       return new UsuarioFavoritoElementoDTO(eliminado);
     } catch (error) {
+      console.error(error);
       throw new ErrorResponseDTO({
         code: 500,
         message: "Error al eliminar el contenido de favoritos.",
@@ -211,6 +216,7 @@ export const FavoritoService = {
       const creado = await FavoritoDAO.create(data);
       return new UsuarioFavoritoElementoDTO(creado);
     } catch (error) {
+      console.error(error);
       if (error instanceof ErrorResponseDTO) throw error;
 
       throw new ErrorResponseDTO({
