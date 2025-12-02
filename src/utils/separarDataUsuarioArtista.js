@@ -41,7 +41,7 @@
  */
 export function separarDataUsuarioArtista(data, esArtistaActual = false) {
   // usuario
-  const usuarioFields = [
+  const usuarioFields = new Set([
     "nombreusuario",
     "nombrereal",
     "contrasenia",
@@ -50,24 +50,24 @@ export function separarDataUsuarioArtista(data, esArtistaActual = false) {
     "fecharegistro",
     "rutafoto",
     "esartista"
-  ];
+  ]);
 
   // artista
-  const artistaFields = [
+  const artistaFields = new Set([
     "esnovedad",
     "oyentes",
     "valoracion",
     "idgenero",   
-  ];
+  ]);
 
   const usuarioData = {};
   const artistaData = {};
 
-  for (const key in data) {
-    if (usuarioFields.includes(key)) {
+  for (const key in Object.keys(data)) {
+    if (usuarioFields.has(key)) {
       usuarioData[key] = data[key];
     } 
-    else if (artistaFields.includes(key)) {
+    else if (artistaFields.has(key)) {
       artistaData[key] = data[key];
     }
   }
