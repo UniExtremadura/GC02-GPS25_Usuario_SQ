@@ -859,7 +859,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"idusuario\": 23,\n  \"idelemento\": 1\n}\nspringdoc.api-docs.path=/api-docs\nserver.servlet.contextPath=/api\nserver.port=8083\nspring.jackson.date-format=io.swagger.RFC3339DateFormat\nspring.jackson.serialization.WRITE_DATES_AS_TIMESTAMPS=false\n\n# --- DATASOURCE ---\nspring.datasource.url=jdbc:oracle:thin:@localhost:1521/XEPDB1\nspring.datasource.username=ASEE\nspring.datasource.password=12345\nspring.datasource.driver-class-name=oracle.jdbc.OracleDriver\n\n# --- JPA / HIBERNATE ---\nspring.jpa.database-platform=org.hibernate.dialect.Oracle12cDialect\nspring.jpa.hibernate.ddl-auto=update\nspring.jpa.show-sql=true\n",
+							"raw": "{\n  \"idusuario\": 23,\n  \"idelemento\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1211,7 +1211,7 @@
 		"jwt": [
 			{
 				"key": "header",
-				"value": "{eyJhbGciOiJSUzI1NiIsImtpZCI6IjU0NTEzMjA5OWFkNmJmNjEzODJiNmI0Y2RlOWEyZGZlZDhjYjMwZjAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiUHJ1ZWJhUE9TVDEyM3YyIiwicGljdHVyZSI6Imh0dHBzOi8vZXhhbXBsZS5jb20vcGVyZmlsZXMvcGVyZmlsMTIzLmpwZyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS91bmRlcnNvdW5kcy1kYzBkZCIsImF1ZCI6InVuZGVyc291bmRzLWRjMGRkIiwiYXV0aF90aW1lIjoxNzYyMzcwMjg2LCJ1c2VyX2lkIjoiMTgiLCJzdWIiOiIxOCIsImlhdCI6MTc2MjM3MDI4NiwiZXhwIjoxNzYyMzczODg2LCJlbWFpbCI6InBydWViYXBvc3QxMjN2MkBleGFtcGxlLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJwcnVlYmFwb3N0MTIzdjJAZXhhbXBsZS5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.UviZbo006LFKHIU8_WXmunJUR1L9fDQ9OvGg38rDTFeJjMOTY89vLB_o6Qi3dfuQYoxIDmck1F2VTET81EUeZCYEuecBkBp34Nj-6QRzJpjyOAw37pI5WpQGOWAKW3Dv5i0gvjvswmiPkpBT9q2IWz_5ECHePDfm__7OdZ6J6xBos-pAlh340cX3kY7M6daTRxjIG_ypeDntUKkT9zm08537Y84ojCpaLCH22N72SJipDyA_0PahWvPb0SXmLaRU-ANxuY-dlbKXSY7VyLq4IT0fwmYdkJObMwUPQ2WCkLMcZIect-bFyvs-NVnhxip9JhmgB29ZR0bHXqdeyc85ZQ}",
+				"value": "{tokenDelUsuario}",
 				"type": "string"
 			},
 			{
@@ -1277,7 +1277,7 @@
 		},
 		{
 			"key": "token",
-			"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjU0NTEzMjA5OWFkNmJmNjEzODJiNmI0Y2RlOWEyZGZlZDhjYjMwZjAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiUHJ1ZWJhUE9TVDEyM3YyIiwicGljdHVyZSI6Imh0dHBzOi8vZXhhbXBsZS5jb20vcGVyZmlsZXMvcGVyZmlsMTIzLmpwZyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS91bmRlcnNvdW5kcy1kYzBkZCIsImF1ZCI6InVuZGVyc291bmRzLWRjMGRkIiwiYXV0aF90aW1lIjoxNzYyMzcwMjg2LCJ1c2VyX2lkIjoiMTgiLCJzdWIiOiIxOCIsImlhdCI6MTc2MjM3MDI4NiwiZXhwIjoxNzYyMzczODg2LCJlbWFpbCI6InBydWViYXBvc3QxMjN2MkBleGFtcGxlLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJwcnVlYmFwb3N0MTIzdjJAZXhhbXBsZS5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.UviZbo006LFKHIU8_WXmunJUR1L9fDQ9OvGg38rDTFeJjMOTY89vLB_o6Qi3dfuQYoxIDmck1F2VTET81EUeZCYEuecBkBp34Nj-6QRzJpjyOAw37pI5WpQGOWAKW3Dv5i0gvjvswmiPkpBT9q2IWz_5ECHePDfm__7OdZ6J6xBos-pAlh340cX3kY7M6daTRxjIG_ypeDntUKkT9zm08537Y84ojCpaLCH22N72SJipDyA_0PahWvPb0SXmLaRU-ANxuY-dlbKXSY7VyLq4IT0fwmYdkJObMwUPQ2WCkLMcZIect-bFyvs-NVnhxip9JhmgB29ZR0bHXqdeyc85ZQ",
+			"value": "tokenDelUsuario",
 			"type": "string"
 		}
 	]
