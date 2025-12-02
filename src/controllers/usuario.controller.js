@@ -83,7 +83,7 @@ export const UsuarioController = {
   */
   async getUsuarioPubliById(req, res) {
     try {
-      const id = parseInt(req.params.id);
+      const id = Number.parseInt(req.params.id);
       if (Number.isNaN(id)) {
         return res.status(400).json(new ErrorResponseDTO({
           code: 400,
@@ -155,7 +155,7 @@ export const UsuarioController = {
   */
   async getLogin(req, res) {
     try {
-      const uid = parseInt(req.user?.uid);
+      const uid = Number.parseInt(req.user?.uid);
       if (Number.isNaN(uid)) {
         return res.status(400).json(new ErrorResponseDTO({
           code: 400,
@@ -271,7 +271,7 @@ export const UsuarioController = {
   */
   async deleteUsuario(req, res) {
     try {
-      const id = parseInt(req.params.id ?? req.user?.uid);
+      const id = Number.parseInt(req.params.id ?? req.user?.uid);
       if (Number.isNaN(id)) {
         return res.status(400).json(new ErrorResponseDTO({ code: 400, message: 'ID inválido.', path: req.originalUrl }));
       }

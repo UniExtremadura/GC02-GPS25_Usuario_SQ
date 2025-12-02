@@ -30,7 +30,7 @@ export const CestaController = {
    */
   async getCestaByUser(req, res) {
     try {
-      const idusuario = parseInt(req.params.idusuario);
+      const idusuario = Number.parseInt(req.params.idusuario);
       const data = await CestaService.getCestaByUser(idusuario);
       res.status(200).json(data);
     } catch (error) {
@@ -139,8 +139,8 @@ export const CestaController = {
    */
   async existItemCesta(req, res) {
     try {
-      const idusuario = parseInt(req.params.idusuario);
-      const idelemento = parseInt(req.params.idelemento);
+      const idusuario = Number.parseInt(req.params.idusuario);
+      const idelemento = Number.parseInt(req.params.idelemento);
 
       const isInCesta = await CestaService.existItemCesta(idusuario, idelemento);
 
@@ -185,8 +185,8 @@ export const CestaController = {
    */
   async deleteItemCesta(req, res) {
     try {
-      const idusuario = parseInt(req.params.idusuario);
-      const idelemento = parseInt(req.params.idelemento);
+      const idusuario = Number.parseInt(req.params.idusuario);
+      const idelemento = Number.parseInt(req.params.idelemento);
 
       const eliminado = await CestaService.deleteItemCesta(idusuario, idelemento);
 

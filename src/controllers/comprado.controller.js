@@ -30,7 +30,7 @@ export const CompradoController = {
    */
   async getCompradosByIdUsuario(req, res) {
     try {
-      const idusuario = parseInt(req.params.idusuario);
+      const idusuario = Number.parseInt(req.params.idusuario);
       const data = await CompradoService.getCompradosByIdUsuario(idusuario);
       res.status(200).json(data);
     } catch (error) {
@@ -73,7 +73,7 @@ export const CompradoController = {
    */
   async createComprados(req, res) {
     try {
-      const idusuario = parseInt(req.params.idusuario);
+      const idusuario = Number.parseInt(req.params.idusuario);
       const data = await CompradoService.createComprados(idusuario);
 
       if (!data) {
@@ -128,8 +128,8 @@ export const CompradoController = {
    */
   async exitComprado(req, res) {
     try {
-      const idusuario = parseInt(req.params.idusuario);
-      const idelemento = parseInt(req.params.idelemento);
+      const idusuario = Number.parseInt(req.params.idusuario);
+      const idelemento = Number.parseInt(req.params.idelemento);
 
       const data = await CompradoService.existComprado(idusuario, idelemento);
       res.status(200).json(data);

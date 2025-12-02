@@ -30,7 +30,7 @@ export const DeseaController = {
    */
   async getDeseadosByUser(req, res) {
     try {
-      const idusuario = parseInt(req.params.idusuario);
+      const idusuario = Number.parseInt(req.params.idusuario);
       const data = await DeseaService.getDeseadosByUser(idusuario);
       res.status(200).json(data);
     } catch (error) {
@@ -70,8 +70,8 @@ export const DeseaController = {
    */
   async existDeseado(req, res) {
     try {
-      const idusuario = parseInt(req.params.idusuario);
-      const idelemento = parseInt(req.params.idelemento);
+      const idusuario = Number.parseInt(req.params.idusuario);
+      const idelemento = Number.parseInt(req.params.idelemento);
       const data = await DeseaService.existDeseado(idusuario, idelemento);
       res.status(200).json(data);
     } catch (error) {
@@ -113,8 +113,8 @@ export const DeseaController = {
    */
   async deleteDeseado(req, res) {
     try {
-      const idusuario = parseInt(req.params.idusuario);
-      const idelemento = parseInt(req.params.idelemento);
+      const idusuario = Number.parseInt(req.params.idusuario);
+      const idelemento = Number.parseInt(req.params.idelemento);
       const deleted = await DeseaService.deleteDeseado(idusuario, idelemento);
       if (!deleted) {
         return res.status(404).json(

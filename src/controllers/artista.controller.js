@@ -71,7 +71,7 @@ export const ArtistaController = {
    */
   async getArtistaById(req, res) {
     try {
-      const id = parseInt(req.params.id);
+      const id = Number.parseInt(req.params.id);
       const data = await ArtistaService.getArtistaById(id);
 
       if (!data) {
