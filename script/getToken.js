@@ -77,24 +77,20 @@ async function signInWithEmailAndPassword(email, password) {
   return body;
 }
 
-async function main() {
-  const [,, email, password] = process.argv;
+const [,, email, password] = process.argv;
 
-  if (!email || !password) {
-    console.log("Uso: node script/getToken.js <email> <password>");
-    process.exit(1);
-  }
-
-  try {
-    const result = await signInWithEmailAndPassword(email, password);
-    console.log("✅ Token obtenido con éxito:");
-    console.log("idToken:", result.idToken);
-    console.log("refreshToken:", result.refreshToken);
-    console.log("uid:", result.localId);
-    console.log("expiresIn:", result.expiresIn);
-  } catch (err) {
-    console.error("❌ Error:", err.message);
-  }
+if (!email || !password) {
+  console.log("Uso: node script/getToken.js <email> <password>");
+  process.exit(1);
 }
 
-main();
+try {
+  const result = await signInWithEmailAndPassword(email, password);
+  console.log("✅ Token obtenido con éxito:");
+  console.log("idToken:", result.idToken);
+  console.log("refreshToken:", result.refreshToken);
+  console.log("uid:", result.localId);
+  console.log("expiresIn:", result.expiresIn);
+} catch (err) {
+  console.error("❌ Error:", err.message);
+}
