@@ -47,7 +47,7 @@ export class CestaDTO {
   constructor({ items = [] }) {
     this.items = items.map((i) => new CestaItemDTO(i));
 
-    this.total = parseFloat(
+    this.total = Number.parseFloat(
       this.items
         .reduce((acc, item) => acc + (Number(item.precio) || 0), 0)
         .toFixed(2)

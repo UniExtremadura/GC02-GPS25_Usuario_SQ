@@ -49,7 +49,7 @@ export const CestaService = {
           return new CestaItemDTO({
             idelemento: elem.idelemento,
             nombre: data.nombre,
-            precio: parseFloat(data.precio.toFixed(2)),
+            precio: Number.parseFloat(data.precio.toFixed(2)),
             rutaimagen: data.urlFoto ?? null,
             tipo: data.esalbum ? 2 : 1, // 1 = canción, 2 = álbum
           });
