@@ -36,7 +36,7 @@ export const ArtistaService = {
       // Llamadas paralelas a la API externa
       const usuariosCompletos = await Promise.all(
         usuarios.map(async (user) => {
-          if (!user.artista || !user.artista.idgenero) {
+          if (!user.artista?.idgenero) {
             return new ArtistaDTO({ ...user, genero: null });
           }
 
@@ -88,7 +88,7 @@ export const ArtistaService = {
       const usuario = await ArtistaDAO.findById(id);
       if (!usuario) return null;
       
-      if (!usuario.artista || !usuario.artista.idgenero) {
+      if (!usuario.artista?.idgenero) {
         return new ArtistaDTO({ ...usuario, genero: null });
       }
 

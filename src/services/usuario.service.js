@@ -31,7 +31,7 @@ export const UsuarioService = {
         if (!user.esartista) return new UsuarioDTO(user);
 
         // si es artista pero no tiene idgenero, devolvemos ArtistaDTO con genero null
-        if (!user.artista || !user.artista.idgenero) return new ArtistaDTO({ ...user, genero: null });
+        if (!user.artista?.idgenero) return new ArtistaDTO({ ...user, genero: null });
 
         // obtener género desde microservicio de contenidos
         const url = `${process.env.API_CONTENIDO}/generos/${user.artista.idgenero}`;
@@ -75,7 +75,7 @@ export const UsuarioService = {
           }
 
           // crear usuario en Firebase con UID igual al id de la BD
-          firebaseUser = await firebaseAdmin.auth().createUser({
+          await firebaseAdmin.auth().createUser({
             uid: String(usuario.id),
             email: usuario.correo,
             password: data.contrasenia,
@@ -120,7 +120,7 @@ export const UsuarioService = {
 
       if (!usuario.esartista) return new UsuarioDTO(usuario);
 
-      if (!usuario.artista || !usuario.artista.idgenero) return new ArtistaDTO({ ...usuario, genero: null });
+      if (!usuario.artista?.idgenero) return new ArtistaDTO({ ...usuario, genero: null });
 
       const url = `${process.env.API_CONTENIDO}/generos/${usuario.artista.idgenero}`;
       const response = await fetch(url);
@@ -175,7 +175,7 @@ export const UsuarioService = {
       }
 
       const usuarioFinal = await UsuarioDAO.findById(data.id);
-      if (!usuarioFinal.artista || !usuarioFinal.artista.idgenero) {
+      if (!usuarioFinal.artista?.idgenero) {
         return new ArtistaDTO({ ...usuarioFinal, genero: null });
       }
 

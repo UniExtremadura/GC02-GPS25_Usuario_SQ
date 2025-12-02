@@ -234,7 +234,7 @@ export const UsuarioController = {
   async updateUsuario(req, res) {
     try {
       const body = req.body;
-      if (!body || !body.id) {
+      if (!body?.id) {
         return res.status(400).json(new ErrorResponseDTO({ code: 400, message: 'Faltan datos del usuario.', path: req.originalUrl }));
       }
 

@@ -24,7 +24,7 @@ export const verifyFirebaseToken = async (req,res,next) => {
     //Devuelve la autentificacion del header, se busca el Bearer
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {//Si no esta ya lo tiene prohibido
+    if (!authHeader?.startsWith("Bearer ")) {//Si no esta ya lo tiene prohibido
       return res.status(401).json({ message: "Token no proporcionado" });
     }
 
